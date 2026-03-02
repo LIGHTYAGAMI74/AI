@@ -123,6 +123,7 @@ import StudentTests from './StudentTest';
 import { Book, BarChart2, PenTool, LogOut, X, AlertTriangle, Lock } from 'lucide-react';
 
 export default function StudentDashboard() {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const [activeTab, setActiveTab] = useState<'modules' | 'analytics' | 'tests'>('modules');
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [user, setUser] = useState<any>(null);
@@ -140,7 +141,7 @@ export default function StudentDashboard() {
 
     const fetchProfile = async () => {
       try {
-        const res = await fetch("http://localhost:5050/api/auth/profile", {
+        const res = await fetch(`${API_URL}/api/auth/profile`, {
           headers: { "Authorization": `Bearer ${token}` }
         });
         const data = await res.json();
@@ -159,7 +160,7 @@ export default function StudentDashboard() {
   const token = localStorage.getItem("token");
   
   try {
-    const res = await fetch("http://localhost:5050/api/payment/create-order", {
+    const res = await fetch(`${API_URL}/api/payment/create-order`, {
       method: "POST",
       headers: { "Authorization": `Bearer ${token}` }
     });
@@ -179,7 +180,7 @@ export default function StudentDashboard() {
       description: "Neural Network Access Fee",
       order_id: order.id,
       handler: async function (response: any) {
-        const verifyRes = await fetch("http://localhost:5050/api/payment/verify-payment", {
+        const verifyRes = await fetch(`${API_URL}/api/payment/verify-payment`, {
           method: "POST",
           headers: { 
             "Content-Type": "application/json",

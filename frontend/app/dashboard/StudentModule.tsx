@@ -5,12 +5,13 @@ export default function StudentModules() {
   // 1. Always initialize as an empty array
   const [modules, setModules] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
     const fetchModules = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:5050/api/module/all", {
+        const res = await fetch(`${API_URL}/api/module/all`, {
           headers: { 
             "Authorization": `Bearer ${token}` // 2. MUST send token now
           }
@@ -36,7 +37,7 @@ export default function StudentModules() {
 
   const handleModuleClick = async (module: any) => {
     const token = localStorage.getItem("token");
-    await fetch("http://localhost:5050/api/auth/log-activity", {
+    await fetch(`${API_URL}/api/auth/log-activity`, {
       method: "POST",
       headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" }
     });

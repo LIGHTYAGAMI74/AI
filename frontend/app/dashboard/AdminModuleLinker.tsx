@@ -6,12 +6,13 @@ export default function AdminModuleLinker() {
   const [title, setTitle] = useState("");
   const [notionUrl, setNotionUrl] = useState("");
   const [level, setLevel] = useState("6-8"); // NEW: State for level
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
     
-    const res = await fetch("http://localhost:5050/api/module/add", {
+    const res = await fetch(`${API_URL}/api/module/add`, {
       method: "POST",
       headers: { 
         "Content-Type": "application/json", 

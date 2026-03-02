@@ -4,11 +4,12 @@ import ActivityGrid from './ActivityGrid';
 
 export default function StudentAnalytics() {
   const [data, setData] = useState<any>(null);
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:5050/api/auth/profile", {
+      const res = await fetch(`${API_URL}/api/auth/profile`, {
         headers: { "Authorization": `Bearer ${token}` }
       });
       const userData = await res.json();

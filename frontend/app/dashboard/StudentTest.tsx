@@ -5,10 +5,11 @@ import LockedExam from './LockExamed'; // We will create this next
 export default function StudentTests() {
   const [tests, setTests] = useState<any[]>([]);
   const [activeTest, setActiveTest] = useState<any>(null);
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
     const fetchTests = async () => {
-      const res = await fetch("http://localhost:5050/api/tests/all", {
+      const res = await fetch(`${API_URL}/api/tests/all`, {
         headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
       });
       const data = await res.json();

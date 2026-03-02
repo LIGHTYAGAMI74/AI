@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Plus, Trash2, CheckCircle2 } from 'lucide-react';
 
 export default function AdminTestCreator() {
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const [title, setTitle] = useState("");
   const [duration, setDuration] = useState(20);
   const [level, setLevel] = useState("6-8");
@@ -13,7 +14,7 @@ export default function AdminTestCreator() {
 
   const handlePublish = async () => {
     const token = localStorage.getItem("token");
-    const res = await fetch("http://localhost:5050/api/tests/create", {
+    const res = await fetch(`${API_URL}/api/tests/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
       body: JSON.stringify({ title, duration, questions, level }),

@@ -6,14 +6,14 @@ import Link from 'next/link';
 export default function RegisterPage() {
   const [formData, setFormData] = useState({ name: "", email: "", password: "", role: "student", level: "" });
   const router = useRouter();
-  const API_URL = "http://localhost:5050/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.level) return alert("Please select your class level!");
 
     try {
-      const res = await fetch(`${API_URL}/auth/register`, {
+      const res = await fetch(`${API_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
