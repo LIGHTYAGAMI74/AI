@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import LockedExam from './LockExamed'; // We will create this next
+import LockedExam from './LockExamed'; 
 
 export default function StudentTests() {
   const [tests, setTests] = useState<any[]>([]);
@@ -23,18 +23,29 @@ export default function StudentTests() {
   }
 
   return (
-    <div className="max-w-5xl">
-      <h2 className="text-4xl font-black uppercase mb-10 italic underline decoration-4 underline-offset-8">Available Mock Tests</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div className="max-w-5xl font-mono">
+      <h2 className="text-6xl font-black uppercase mb-12 italic tracking-tighter">
+        Active <span className="bg-pink-500 text-white px-4 border-4 border-black">Missions</span>
+      </h2>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         {tests.map((t) => (
-          <div key={t._id} className="border-4 border-black p-8 rounded-3xl bg-yellow-50 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-            <h3 className="text-2xl font-black uppercase mb-2">{t.title}</h3>
-            <p className="font-bold text-gray-500 mb-6 uppercase text-xs tracking-widest">⏳ Duration: {t.duration} Minutes</p>
+          <div key={t._id} className="group relative border-[6px] border-black p-10 bg-white shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] hover:bg-yellow-50 transition-all overflow-hidden">
+            {/* Action text background decoration */}
+            <div className="absolute -right-4 -top-4 text-gray-100 font-black text-9xl opacity-20 pointer-events-none group-hover:text-pink-100 uppercase">
+              GO!
+            </div>
+
+            <h3 className="text-4xl font-black uppercase italic tracking-tighter mb-4 relative z-10">{t.title}</h3>
+            <div className="inline-block bg-black text-white px-3 py-1 text-[10px] font-black uppercase mb-8 relative z-10 shadow-[4px_4px_0px_0px_rgba(59,130,246,1)]">
+              ⏳ Duration: {t.duration} MIN
+            </div>
+
             <button 
               onClick={() => setActiveTest(t)}
-              className="w-full bg-black text-white py-4 font-black uppercase text-sm shadow-[4px_4px_0px_0px_rgba(253,224,71,1)] hover:bg-gray-800 transition-all"
+              className="w-full bg-blue-600 text-white py-6 border-[4px] border-black font-black uppercase text-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:bg-black transition-all relative z-10 active:translate-y-1 active:shadow-none"
             >
-              Initiate Exam Protocol
+              START MISSION ↗
             </button>
           </div>
         ))}

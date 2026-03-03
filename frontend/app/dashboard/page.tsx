@@ -12,7 +12,6 @@ export default function DashboardPage() {
   useEffect(() => {
     const userRole = localStorage.getItem("userRole");
     const token = localStorage.getItem("token");
-
     if (!token) {
       router.push("/login");
     } else {
@@ -22,8 +21,9 @@ export default function DashboardPage() {
   }, [router]);
 
   if (loading) return (
-    <div className="flex h-screen w-full items-center justify-center bg-white">
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-black border-t-transparent"></div>
+    <div className="flex h-screen w-full flex-col items-center justify-center bg-[#fffbeb]">
+      <div className="h-16 w-16 animate-spin border-[8px] border-black border-t-pink-500 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"></div>
+      <h2 className="mt-8 font-black text-2xl italic uppercase tracking-tighter">Syncing Reality...</h2>
     </div>
   );
 

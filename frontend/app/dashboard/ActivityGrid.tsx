@@ -1,33 +1,30 @@
-
 import React from 'react';
 
 interface ActivityProps {
-  activityLog: string[]; // Expected format: ["2026-03-01", "2026-02-28"]
+  activityLog: string[];
 }
 
 export default function ActivityGrid({ activityLog = [] }: ActivityProps) {
-  // 1. Generate the last 100 days for the grid
   const today = new Date();
   const days = Array.from({ length: 100 }, (_, i) => {
     const d = new Date();
     d.setDate(today.getDate() - i);
     return d.toISOString().split('T')[0];
-  }).reverse(); // Reverse so the most recent day is at the end
+  }).reverse();
 
   return (
-    <div className="border-4 border-black p-8 rounded-[40px] bg-white shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] mb-10">
-      <div className="flex justify-between items-end mb-6">
+    <div className="border-[6px] border-black p-8 bg-white shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] mb-10 -rotate-1">
+      <div className="flex justify-between items-end mb-6 border-b-4 border-black pb-4">
         <div>
-          <h3 className="text-2xl font-black uppercase italic tracking-tighter">Consistency Graph</h3>
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Neural Commitment Log</p>
+          <h3 className="text-3xl font-black uppercase italic tracking-tighter bg-yellow-400 px-4 py-1 border-2 border-black inline-block -rotate-2">Consistency Graph</h3>
+          <p className="text-xs font-black text-black uppercase tracking-widest mt-2">Neural Commitment Log // [ACTIVE_STATUS]</p>
         </div>
-        <div className="text-right">
-          <span className="text-4xl font-black italic">{activityLog.length}</span>
-          <span className="text-xs font-black uppercase ml-2 text-blue-600">Total Commits</span>
+        <div className="text-right bg-black text-white p-4 rotate-3 border-2 border-white shadow-[4px_4px_0px_0px_rgba(59,130,246,1)]">
+          <span className="text-4xl font-black italic leading-none">{activityLog.length}</span>
+          <p className="text-[10px] font-black uppercase">Commits</p>
         </div>
       </div>
 
-      {/* THE GRID */}
       <div className="flex flex-wrap gap-2">
         {days.map((date) => {
           const isActive = activityLog.includes(date);
@@ -36,10 +33,10 @@ export default function ActivityGrid({ activityLog = [] }: ActivityProps) {
               key={date}
               title={date}
               className={`
-                w-5 h-5 rounded-md border-2 transition-all duration-300
+                w-5 h-5 border-[3px] transition-all duration-300
                 ${isActive 
-                  ? 'bg-black border-black scale-110 shadow-[3px_3px_0px_0px_rgba(59,130,246,1)]' 
-                  : 'bg-white border-gray-100 hover:border-black hover:scale-105'
+                  ? 'bg-blue-500 border-black scale-110 rotate-3 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]' 
+                  : 'bg-white border-black/10 hover:border-black hover:bg-yellow-100'
                 }
               `}
             />
@@ -47,16 +44,15 @@ export default function ActivityGrid({ activityLog = [] }: ActivityProps) {
         })}
       </div>
 
-      {/* LEGEND */}
-      <div className="mt-8 flex items-center gap-4">
-        <span className="text-[10px] font-black uppercase text-gray-400">Low Activity</span>
+      <div className="mt-8 flex items-center gap-4 bg-gray-100 p-3 border-2 border-black">
+        <span className="text-[10px] font-black uppercase">Low Activity</span>
         <div className="flex gap-1">
-          <div className="w-3 h-3 border-2 border-gray-100 bg-white rounded-sm" />
-          <div className="w-3 h-3 border-2 border-gray-300 bg-gray-100 rounded-sm" />
-          <div className="w-3 h-3 border-2 border-black bg-gray-500 rounded-sm" />
-          <div className="w-3 h-3 border-2 border-black bg-black rounded-sm shadow-[1px_1px_0px_0px_rgba(59,130,246,1)]" />
+          <div className="w-4 h-4 border-2 border-black bg-white" />
+          <div className="w-4 h-4 border-2 border-black bg-blue-200" />
+          <div className="w-4 h-4 border-2 border-black bg-blue-400" />
+          <div className="w-4 h-4 border-2 border-black bg-blue-600 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]" />
         </div>
-        <span className="text-[10px] font-black uppercase text-gray-400">Peak Performance</span>
+        <span className="text-[10px] font-black uppercase">Peak Performance</span>
       </div>
     </div>
   );
