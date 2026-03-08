@@ -16,7 +16,6 @@ connectDB();
 const allowedOrigins = [
   "http://localhost:3000",
   "https://benolympaid.vercel.app",
-  "https://benolympaid-git-main-yourusername.vercel.app",
   "https://ben-gridixa.vercel.app",
 ];
 
