@@ -7,7 +7,8 @@ export default function PayButton() {
     const token = localStorage.getItem("token");
 
     // 1. Create Order on Backend
-    const res = await fetch("http://localhost:5050/api/payment/create-order", {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
+    const res = await fetch(`${API_URL}/api/payment/create-order`, {
       method: "POST",
       headers: { "Authorization": `Bearer ${token}` }
     });
@@ -23,7 +24,8 @@ export default function PayButton() {
       order_id: order.id,
       handler: async function (response: any) {
         // 3. Verify on Backend
-        const verifyRes = await fetch("http://localhost:5050/api/payment/verify-payment", {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
+        const verifyRes = await fetch(`${API_URL}/api/payment/verify-payment`, {
           method: "POST",
           headers: { 
             "Content-Type": "application/json",

@@ -15,7 +15,31 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "BEN",
   description: "welcome to the Ben",
-
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
+  openGraph: {
+    title: 'BEN',
+    description: 'welcome to the Ben',
+    url: '/',
+    siteName: 'BEN',
+    images: [
+      {
+        url: '/og.png',
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'BEN',
+    description: 'welcome to the Ben',
+    images: ['/og.png'],
+  },
+  alternates: {
+    canonical: '/',
+  },
 };
 
 export default function RootLayout({
