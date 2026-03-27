@@ -13,9 +13,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BEN",
-  description: "welcome to the Ben",
-
+  title: {
+    default: "BEN AI",
+    template: "%s | BEN AI",
+  },
+  description:
+    "AI Olympiad platform for students to learn, test, and master artificial intelligence.",
+  keywords: [
+    "AI Olympiad",
+    "Artificial Intelligence for students",
+    "AI learning platform",
+  ],
 };
 
 export default function RootLayout({

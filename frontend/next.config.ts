@@ -34,7 +34,7 @@ const nextConfig: NextConfig = {
               script-src 'self' 'unsafe-inline' https://checkout.razorpay.com;
               style-src 'self' 'unsafe-inline';
               img-src 'self' data:;
-              connect-src 'self' ${process.env.NEXT_PUBLIC_API_URL};
+              connect-src 'self' ${process.env.NEXT_PUBLIC_API_URL} http://localhost:5000;
             `.replace(/\n/g, ""),
           },
         ],
