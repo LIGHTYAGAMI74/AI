@@ -31,7 +31,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-6 font-sans text-black">
+    <div className="min-h-screen bg-[#fff9e6] flex items-center justify-center p-6 font-sans text-black">
       <div className="w-full max-w-md bg-white border-4 border-black p-8 rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
         <h1 className="text-4xl font-black uppercase italic tracking-tighter mb-2 underline decoration-yellow-400">Join BEN<span className="text-blue-500">.</span></h1>
         <p className="text-gray-500 font-bold mb-8 uppercase text-[10px] tracking-widest">Create your intelligence profile</p>
@@ -69,9 +69,9 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
               onChange={(e) => setFormData({...formData, level: e.target.value})}
             >
               <option value="">-- CHOOSE LEVEL --</option>
-              <option value="6-8">Class 6 - 8 (Junior)</option>
-              <option value="9-12">Class 9 - 12 (Senior)</option>
-              <option value="College">College / Professional</option>
+              <option value="6-8">Class 6 - 8</option>
+              <option value="9-12">Class 9 - 10</option>
+              <option value="College">Class 11- 12</option>
             </select>
           </div>  
           
