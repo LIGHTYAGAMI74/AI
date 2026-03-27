@@ -1,13 +1,43 @@
 import type { NextConfig } from "next";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
 const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        // This matches any request starting with /api
-        source: '/api/:path*',
-        // This redirects it to your Express backend
-        destination: 'http://localhost:5000/api/:path*', 
+        source: "/api/:path*",
+        destination: `${API_URL}/:path*`,
+      },
+    ];
+  },
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "X-Frame-Options",
+            value: "DENY",
+          },
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+          {
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
+          },
+          {
+            key: "Content-Security-Policy",
+            value: `
+              default-src 'self';
+              script-src 'self' 'unsafe-inline' https://checkout.razorpay.com;
+              style-src 'self' 'unsafe-inline';
+              img-src 'self' data:;
+              connect-src 'self' ${process.env.NEXT_PUBLIC_API_URL};
+            `.replace(/\n/g, ""),
+          },
+        ],
       },
     ];
   },

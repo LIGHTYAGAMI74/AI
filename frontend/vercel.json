@@ -1,3 +1,7 @@
 {
-  "regions": ["sin1"]
+  "regions": ["sin1"],
+  "framework": "nextjs",
+  "env": {
+    "NEXT_PUBLIC_API_URL": "https://localhost:5000/api"
+  }
 }
