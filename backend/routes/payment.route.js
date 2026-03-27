@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Razorpay = require('razorpay');
 const User = require('../model/user');
-const auth = require('../middleware/auth.middleware');
+const auth = require('../middleware/auth');
 
 // Use a function to get the Razorpay instance safely
 const getRazorpayInstance = () => {

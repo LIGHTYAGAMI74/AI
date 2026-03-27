@@ -33,7 +33,7 @@ const express = require('express');
 const router = express.Router();
 const Module = require('../model/module');
 const User = require('../model/user'); // 1. Import User model to check student level
-const auth = require('../middleware/auth.middleware');
+const auth = require('../middleware/auth');
 
 // ADMIN: Save a new Notion link (Tagged by Level)
 router.post('/add', auth, async (req, res) => {
