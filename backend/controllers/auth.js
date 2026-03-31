@@ -129,3 +129,12 @@ exports.resetPassword = async (req, res) => {
 
   res.json({ message: "Password updated" });
 };
+
+// GET /auth/check-user?email=
+exports.checkUser = async (req, res) => {
+  const user = await User.findOne({ email: req.query.email });
+
+  if (user) return res.status(400).json({ exists: true });
+
+  res.json({ exists: false });
+};

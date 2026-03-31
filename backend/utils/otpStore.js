@@ -81,7 +81,6 @@ exports.saveOtp = async (email, otp) => {
 
   try {
     await sendOtpEmail(email, otp);
-    console.log("✅ OTP sent to:", email);
   } catch (err) {
     console.error("❌ Email send failed:", err.message);
     throw new Error("Failed to send OTP email");

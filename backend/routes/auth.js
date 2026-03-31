@@ -11,12 +11,16 @@ const {
   forgotPassword,
   verifyOtp,
   resetPassword,
+  checkUser,
 } = require("../controllers/auth");
 
 // REGISTER FLOW
 router.post("/send-register-otp", sendRegisterOtp);
 router.post("/verify-register-otp", verifyRegisterOtp);
 router.post("/register", register);
+
+// CHECK USER
+router.get("/check-user", checkUser);
 
 // LOGIN
 router.post("/login", login);
