@@ -150,7 +150,7 @@ export default function RegisterPage() {
               onChange={(e) => setFormData({...formData, password: e.target.value})}
             />
 
-            <button className="w-full bg-black text-white py-4 rounded-2xl font-black">
+            <button className="w-full bg-yellow-400 text-black py-4 rounded-2xl font-black hover:bg-blue-500 hover:text-white transition duration-200">
               Continue
             </button>
           </form>
@@ -188,7 +188,7 @@ export default function RegisterPage() {
               onChange={(e) => setFormData({...formData, board: e.target.value})}
             />
 
-            <button className="w-full bg-black text-white py-4 rounded-2xl font-black">
+            <button className="w-full bg-yellow-400 text-black py-4 rounded-2xl font-black hover:bg-blue-500 hover:text-white transition duration-200">
               Continue
             </button>
           </form>
