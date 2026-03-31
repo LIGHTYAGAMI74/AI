@@ -62,7 +62,7 @@ export default function StudentDashboard() {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY,
         amount: order.amount,
         currency: order.currency,
-        name: "BEN AI ACADEMY",
+        name: "Gridixa AI Olympiad ACADEMY",
         description: "AI ACCESS",
         order_id: order.id,
         handler: async function (response: any) {
@@ -110,7 +110,7 @@ export default function StudentDashboard() {
           <Menu size={24} />
         </button>
         <div className="ml-4 text-2xl font-black uppercase italic tracking-tighter">
-          BEN<span className="text-blue-600">.</span>
+          Gridixa<span className="text-blue-600">.</span>
         </div>
       </header>
 

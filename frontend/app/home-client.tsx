@@ -160,7 +160,7 @@ export default function HomePage() {
               <motion.ul variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="space-y-3">
                 {[
                   "❌ Most schools lack structured AI education",
-                  "❌ No standard benchmarking for AI skills",
+                  "❌ No standard Gridixachmarking for AI skills",
                   "❌ Expensive & inaccessible learning programs",
                 ].map((item, i) => (
                   <motion.li key={i} variants={fadeUp}>

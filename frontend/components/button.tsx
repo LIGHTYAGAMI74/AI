@@ -18,7 +18,7 @@ export default function PayButton() {
       key: "YOUR_RAZORPAY_KEY_ID", 
       amount: order.amount,
       currency: order.currency,
-      name: "BEN AI Academy",
+      name: "Gridixa AI Olympiad Academy",
       description: "Access to All Modules & Tests",
       order_id: order.id,
       handler: async function (response: any) {

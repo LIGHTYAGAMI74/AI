@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "BEN AI",
+    title: "Gridixa AI Olympiad",
     description: "AI-powered learning platform",
     images: ["/og-image.png"],
   },

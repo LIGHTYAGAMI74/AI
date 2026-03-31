@@ -12,8 +12,8 @@ const app = express();
 // Allowed Origins
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://benolympaid.vercel.app",
-  "https://ben-gridixa.vercel.app",
+  "https://Gridixaolympaid.vercel.app",
+  "https://Gridixa-gridixa.vercel.app",
 ];
 
 const corsOptions = {

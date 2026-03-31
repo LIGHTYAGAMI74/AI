@@ -61,7 +61,7 @@ export default function Header() {
             Rewards
           </button>
 
-          <Link href="/login">
+          <Link href="/register">
             <button className="px-6 py-2 bg-pink-400 border-4 border-black shadow-[4px_4px_0px_black] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all">
               Register
             </button>
@@ -117,7 +117,7 @@ export default function Header() {
             Rewards
           </button>
 
-          <Link href="/login" onClick={() => setOpen(false)}>
+          <Link href="/register" onClick={() => setOpen(false)}>
             <button className="w-full mt-2 px-6 py-3 bg-pink-400 border-4 border-black shadow-[4px_4px_0px_black]">
               Register
             </button>

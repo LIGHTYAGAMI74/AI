@@ -1,13 +1,13 @@
-# BEN! - Complete SEO & Codebase Optimization Guide
+# Gridixa! - Complete SEO & Codebase Optimization Guide
 
-This document outlines all necessary changes to improve the existing `BEN AI` codebase for Search Engine Optimization (SEO), high performance, and accessibility. These steps will ensure the application ranks higher in search engines, loads instantly, and provides a bug-free experience.
+This document outlines all necessary changes to improve the existing `Gridixa AI Olympiad` codebase for Search Engine Optimization (SEO), high performance, and accessibility. These steps will ensure the application ranks higher in search engines, loads instantly, and provides a bug-free experience.
 
 ## 1. Next.js App Router SEO (Metadata API)
 Currently, SEO metadata is being handled incorrectly for Next.js 13+ App Router in the `frontend/` directory.
 
 ### The Issue
 - In `app/page.tsx`, you are using `<Head>` (`next/head`) inside a `"use client"` component. In the App Router, client components cannot export or manage metadata easily using `<Head>`.
-- Furthermore, `app/layout.tsx` has very barebones metadata (`title: "BEN"`, `description: "welcome to the Ben"`), and zero Open Graph image or Twitter Card details. 
+- Furthermore, `app/layout.tsx` has very barebones metadata (`title: "Gridixa"`, `description: "welcome to the Gridixa"`), and zero Open Graph image or Twitter Card details. 
 
 ### The Fix
 1. **Move Meta Tags to Server Side**: Define all rich `metadata` inside `app/layout.tsx` (for global defaults) and the server-side `page.tsx` file instead of client files.
