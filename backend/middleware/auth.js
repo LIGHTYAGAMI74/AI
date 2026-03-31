@@ -1,21 +1,17 @@
+// middleware/auth.middleware.js
+
 const jwt = require("jsonwebtoken");
-const { JWT_SECRET } = require("../config/env");
 
-module.exports = function (req, res, next) {
-  const authHeader = req.header("Authorization");
+exports.authMiddleware = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ msg: "No token, authorization denied" });
-  }
-
-  const token = authHeader.split(" ")[1];
+  if (!token) return res.status(401).json({ message: "No token" });
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
     next();
-  } catch (err) {
-    return res.status(401).json({ msg: "Invalid or expired token" });
+  } catch {
+    res.status(401).json({ message: "Invalid token" });
   }
 };
