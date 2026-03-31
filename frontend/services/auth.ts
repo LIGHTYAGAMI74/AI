@@ -11,8 +11,19 @@ export interface RegisterPayload {
   name: string;
   email: string;
   password: string;
+
+  studentPhone: string;
+  parentPhone: string;
+  parentEmail: string;
+
+  level: string;
+  school: string;
+  city: string;
+  state: string;
+  board: string;
+
+  paymentStatus: "pending" | "completed"; // ✅ NEW
   role?: string;
-  level?: string;
 }
 
 // 🔐 LOGIN
@@ -28,6 +39,29 @@ export async function registerUser(data: RegisterPayload) {
   return apiRequest("/auth/register", {
     method: "POST",
     body: JSON.stringify(data),
+  });
+}
+
+// 🔐 REGISTER FLOW
+
+export async function sendRegisterOtp(email: string) {
+  return apiRequest("/auth/send-register-otp", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+export async function verifyRegisterOtp(email: string, otp: string) {
+  return apiRequest("/auth/verify-register-otp", {
+    method: "POST",
+    body: JSON.stringify({ email, otp }),
+  });
+}
+
+export async function createOrder(amount: number) {
+  return apiRequest("/payment/create-order", {
+    method: "POST",
+    body: JSON.stringify({ amount }),
   });
 }
 
