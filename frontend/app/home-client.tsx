@@ -64,7 +64,7 @@ export default function HomePage() {
         <Header />
 
         {/* HERO */}
-        <section className="relative py-16 sm:py-20 md:py-24 flex flex-col items-center justify-center text-center px-4 sm:px-6 overflow-hidden min-h-[80vh]">
+        <section className="relative py-16 sm:py-20 md:py-24 flex flex-col items-center justify-center text-center px-4 sm:px-6 overflow-hidden min-h-[80vh] border-b-[6px] border-black">
 
           <div className="absolute inset-0 opacity-10 pointer-events-none"
             style={{ backgroundImage: 'radial-gradient(#000 2px, transparent 0)', backgroundSize: '24px 24px' }}
@@ -106,7 +106,7 @@ export default function HomePage() {
         </section>
 
         {/* FEATURES */}
-        <section className="py-20 px-6 border-y-[6px] border-black bg-blue-600">
+        <section className="py-20 px-6 bg-blue-600">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             {[
               { icon: Brain, title: "AI Learning", desc: "Structured syllabus from basics to advanced AI" },
@@ -123,9 +123,64 @@ export default function HomePage() {
           </div>
         </section>
 
+        <section id="about" className="py-20 px-6 bg-white border-y-[6px] border-black">
+          <h2 className="text-4xl md:text-5xl font-black uppercase mb-10">
+            Why AI Olympiad?
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-8 font-bold text-lg">
+            <ul className="space-y-3">
+              <li>❌ Most schools lack structured AI education</li>
+              <li>❌ No standard benchmarking for AI skills</li>
+              <li>❌ Expensive & inaccessible learning programs</li>
+            </ul>
+
+            <div className="bg-yellow-400 border-4 border-black p-6 shadow-[6px_6px_0px_black]">
+              <p>
+                The AI Olympiad bridges this gap by providing structured learning,
+                national-level competition, and real-world AI exposure for students.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section id="structure" className="py-24 px-6 bg-[#fff9e6]">
+          <h2 className="text-5xl text-center font-black mb-16 uppercase">
+            Program Structure
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-8">
+
+            {[
+              {
+                title: "Phase 1",
+                subtitle: "Learning",
+                desc: "AI basics, ML concepts, ethics, and real-world applications"
+              },
+              {
+                title: "Phase 2",
+                subtitle: "Practice",
+                desc: "Mock tests, topic quizzes, performance analytics"
+              },
+              {
+                title: "Phase 3",
+                subtitle: "Olympiad Exam",
+                desc: "National level exam with leaderboard rankings"
+              }
+            ].map((item, i) => (
+              <div key={i} className="bg-white border-4 border-black p-6 shadow-[6px_6px_0px_black]">
+                <h3 className="text-xl font-black uppercase">{item.title}</h3>
+                <h4 className="text-2xl font-black text-blue-600 mb-3">{item.subtitle}</h4>
+                <p className="font-bold">{item.desc}</p>
+              </div>
+            ))}
+
+          </div>
+        </section>
+
         {/* SYLLABUS */}
-        <section id="syllabus" className="py-24 px-6">
-          <h2 className="text-5xl font-black mb-12 uppercase border-4 border-black inline-block px-6 py-2 bg-white">
+        <section id="syllabus" className="pb-20 px-6 bg-[#fff9e6] text-center">
+          <h2 className="text-5xl text-center font-black mb-12 uppercase border-4 border-black inline-block px-6 py-2 bg-white">
             Syllabus Structure
           </h2>
 
@@ -152,22 +207,79 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* TEST SYSTEM */}
-        <section className="py-24 px-6 border-y-[6px] border-black bg-white">
-          <h2 className="text-5xl font-black mb-10 uppercase">
-            Testing System
+        <section id="rewards" className="py-24 px-6 bg-blue-600 border-y-[6px] border-black text-black">
+          <h2 className="text-5xl text-center font-black mb-12 uppercase text-white">
+            Rewards & Recognition
           </h2>
 
-          <ul className="space-y-4 font-bold text-lg">
-            <li>✔ Topic-wise Quick Tests (3 Questions)</li>
-            <li>✔ Chapter Tests (5 Questions)</li>
-            <li>✔ Module Tests (10 Questions)</li>
-            <li>✔ Progressive Unlock System</li>
-          </ul>
+          <div className="grid md:grid-cols-3 gap-6">
+
+            {[
+              { rank: "🥇 1st Rank", prize: "₹7,500" },
+              { rank: "🥈 2nd Rank", prize: "₹5,000" },
+              { rank: "🥉 3rd Rank", prize: "₹2,500" },
+            ].map((item, i) => (
+              <div key={i} className="bg-yellow-400 border-4 border-black p-6 shadow-[6px_6px_0px_black]">
+                <h3 className="text-xl font-black">{item.rank}</h3>
+                <p className="text-3xl font-black">{item.prize}</p>
+              </div>
+            ))}
+
+          </div>
+
+          <div className="mt-10 text-white font-bold text-lg">
+            ✔ Certificates for all participants <br />
+            ✔ National leaderboard ranking <br />
+            ✔ School-level recognition
+          </div>
+        </section>
+
+        <section className="py-24 px-6 bg-white">
+          <h2 className="text-5xl text-center font-black mb-12 uppercase">
+            National Impact
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-6">
+
+            {[
+              { label: "Students", value: "10,000+" },
+              { label: "Schools", value: "200+" },
+              { label: "Reach", value: "Pan India" },
+            ].map((item, i) => (
+              <div key={i} className="border-4 border-black p-6 bg-green-400 shadow-[6px_6px_0px_black]">
+                <h4 className="font-black uppercase">{item.label}</h4>
+                <p className="text-3xl font-black">{item.value}</p>
+              </div>
+            ))}
+
+          </div>
+        </section>
+
+        <section className="py-24 px-6 bg-[#fff9e6] border-y-[6px] border-black">
+          <h2 className="text-5xl text-center font-black mb-10 uppercase">
+            Applied AI Skills
+          </h2>
+
+          <p className="font-bold text-center text-lg mb-10">
+            Beyond theory, students gain hands-on exposure to real-world AI tools,
+            problem solving, and practical applications.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              "AI Tools & Use Cases",
+              "Real-world Problem Solving",
+              "Mini Projects & Experiments",
+            ].map((item, i) => (
+              <div key={i} className="bg-white border-4 border-black p-6 shadow-[6px_6px_0px_black] font-black">
+                {item}
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* CTA */}
-        <section className="py-24 text-center px-6">
+        <section className="py-24 text-center px-6 border-y-[6px] border-black">
           <h2 className="text-5xl font-black mb-6 uppercase">
             Ready to Compete?
           </h2>

@@ -21,6 +21,15 @@ export default function Header() {
 
         {/* DESKTOP NAV */}
         <div className="hidden md:flex items-center gap-6 font-black uppercase text-sm">
+          <Link href="#about" className="hover:text-blue-600">
+            About
+          </Link>
+          <Link href="#structure" className="hover:text-blue-600">
+            Structure
+          </Link>
+          <Link href="#rewards" className="hover:text-blue-600">
+            Rewards
+          </Link>
           <Link href="#syllabus" className="hover:text-blue-600">
             Syllabus
           </Link>
