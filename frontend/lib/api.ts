@@ -23,7 +23,12 @@ export async function apiRequest(
     credentials: "include",
   });
 
-  const data = await res.json();
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    throw new Error("Server error (non-JSON response)");
+  }
 
   if (!res.ok) {
     throw new Error(data.message || "Something went wrong");

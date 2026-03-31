@@ -1,11 +1,9 @@
 // app.js
+require("dotenv").config(); // MUST be first line
 const express = require("express");
 const cors = require("cors");
 
-const authRoutes = require("./routes/auth.route");
-const moduleRoutes = require("./routes/module.route");
-const testRoutes = require("./routes/test.route");
-const paymentRoutes = require("./routes/payment.route");
+const authRoutes = require("./routes/auth");
 
 const app = express();
 
@@ -34,9 +32,6 @@ app.use(express.json());
 
 // Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/module", moduleRoutes);
-app.use("/api/tests", testRoutes);
-app.use("/api/payment", paymentRoutes);
 
 // Health Check
 app.get("/", (req, res) => {

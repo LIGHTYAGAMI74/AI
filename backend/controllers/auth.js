@@ -1,39 +1,40 @@
-// controllers/auth.controller.js
-
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const User = require("../models/user.model");
-const { saveOtp, verifyOtp, deleteOtp } = require("../utils/otpStore");
+const User = require("../models/user");
+
+const {
+  saveOtp,
+  verifyOtp: verifyOtpUtil,
+  deleteOtp
+} = require("../utils/otpStore");
 
 // 🔥 GENERATE OTP
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000);
 
-// 📩 SEND REGISTER OTP
+//////////////////////////////////////////////////////////
+// 🔐 REGISTER FLOW
+//////////////////////////////////////////////////////////
+
 exports.sendRegisterOtp = async (req, res) => {
   const { email } = req.body;
 
   const otp = generateOtp();
-  saveOtp(email, otp);
-
-  console.log("OTP:", otp); // replace with email service
+  await saveOtp(email, otp);
 
   res.json({ message: "OTP sent successfully" });
 };
 
-// 🔢 VERIFY REGISTER OTP
 exports.verifyRegisterOtp = async (req, res) => {
   const { email, otp } = req.body;
 
-  const isValid = verifyOtp(email, otp);
-
-  if (!isValid) return res.status(400).json({ message: "Invalid OTP" });
+  if (!verifyOtpUtil(email, otp)) {
+    return res.status(400).json({ message: "Invalid OTP" });
+  }
 
   deleteOtp(email);
-
   res.json({ message: "OTP verified" });
 };
 
-// 📝 REGISTER USER (after OTP)
 exports.register = async (req, res) => {
   try {
     const data = req.body;
@@ -58,7 +59,10 @@ exports.register = async (req, res) => {
   }
 };
 
+//////////////////////////////////////////////////////////
 // 🔐 LOGIN
+//////////////////////////////////////////////////////////
+
 exports.login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -88,7 +92,6 @@ exports.login = async (req, res) => {
 // 🔐 FORGOT PASSWORD FLOW
 //////////////////////////////////////////////////////////
 
-// SEND OTP
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
 
@@ -96,29 +99,25 @@ exports.forgotPassword = async (req, res) => {
   if (!user) return res.status(400).json({ message: "User not found" });
 
   const otp = generateOtp();
-  saveOtp(email, otp);
-
-  console.log("RESET OTP:", otp);
+  await saveOtp(email, otp);
 
   res.json({ message: "OTP sent" });
 };
 
-// VERIFY OTP
 exports.verifyOtp = async (req, res) => {
   const { email, otp } = req.body;
 
-  if (!verifyOtp(email, otp)) {
+  if (!verifyOtpUtil(email, otp)) {
     return res.status(400).json({ message: "Invalid OTP" });
   }
 
   res.json({ message: "OTP verified" });
 };
 
-// RESET PASSWORD
 exports.resetPassword = async (req, res) => {
   const { email, otp, newPassword } = req.body;
 
-  if (!verifyOtp(email, otp)) {
+  if (!verifyOtpUtil(email, otp)) {
     return res.status(400).json({ message: "Invalid OTP" });
   }
 
