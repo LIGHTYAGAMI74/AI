@@ -58,10 +58,10 @@ export async function verifyRegisterOtp(email: string, otp: string) {
   });
 }
 
-export async function createOrder(amount: number) {
+export async function createOrder(amount: number, email: string) {
   return apiRequest("/payment/create-order", {
     method: "POST",
-    body: JSON.stringify({ amount }),
+    body: JSON.stringify({ amount, email }),
   });
 }
 

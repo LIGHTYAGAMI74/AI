@@ -65,7 +65,7 @@ export default function RegisterPage() {
     const loaded = await loadRazorpay();
     if (!loaded) return alert("Razorpay failed");
 
-    const order = await createOrder(14900); // ₹149
+    const order = await createOrder(14900, formData.email);
 
     const options = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
@@ -75,18 +75,18 @@ export default function RegisterPage() {
       description: "Registration Fee",
       order_id: order.id,
       handler: async function (response: any) {
-      await apiRequest("/payment/verify", {
-        method: "POST",
-        body: JSON.stringify({
-          razorpay_order_id: response.razorpay_order_id,
-          razorpay_payment_id: response.razorpay_payment_id,
-          razorpay_signature: response.razorpay_signature,
-          email: formData.email
-        })
-      });
+        await apiRequest("/payment/verify", {
+          method: "POST",
+          body: JSON.stringify({
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+            email: formData.email
+          })
+        });
 
-      alert("Payment Successful!");
-      router.push("/dashboard");
+        alert("Payment Successful!");
+        router.push("/dashboard");
     },
       prefill: {
         name: formData.name,

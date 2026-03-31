@@ -4,9 +4,6 @@ const nodemailer = require("nodemailer");
 
 const otpStore = new Map();
 
-console.log("SMTP_HOST:", process.env.SMTP_HOST);
-console.log("SMTP_PORT:", process.env.SMTP_PORT);
-
 // 🔥 SMTP TRANSPORTER
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,

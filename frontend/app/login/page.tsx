@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { loginUser, sendResetOtp, verifyResetOtp, resetPassword, createOrder } from "@/services/auth";
 import { useAuth } from "@/context/AuthContext";
+import { apiRequest } from "@/lib/api";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -73,7 +74,7 @@ export default function LoginPage() {
     const loaded = await loadRazorpay();
     if (!loaded) return alert("Razorpay failed");
 
-    const order = await createOrder(14900);
+    const order = await createOrder(14900, email);
 
     const options = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
@@ -82,11 +83,18 @@ export default function LoginPage() {
       name: "AI Olympiad",
       description: "Complete Registration",
       order_id: order.id,
-      handler: async function () {
+      handler: async function (response: any) {
+        await apiRequest("/payment/verify", {
+          method: "POST",
+          body: JSON.stringify({
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+            email
+          })
+        });
 
-        // ⚠️ Ideally call verify API here
         alert("Payment Successful!");
-
         setShowPaymentModal(false);
         router.push("/dashboard");
       },

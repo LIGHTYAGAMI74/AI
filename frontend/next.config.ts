@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "X-Frame-Options",
-            value: "DENY",
+            value: "SAMEORIGIN",
           },
           {
             key: "X-Content-Type-Options",
@@ -31,10 +31,34 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: `
               default-src 'self';
-              script-src 'self' 'unsafe-inline' https://checkout.razorpay.com;
-              style-src 'self' 'unsafe-inline';
-              img-src 'self' data:;
-              connect-src 'self' ${process.env.NEXT_PUBLIC_API_URL} http://localhost:5000;
+
+              script-src 
+                'self' 
+                'unsafe-inline' 
+                https://checkout.razorpay.com 
+                https://cdn.razorpay.com;
+
+              style-src 
+                'self' 
+                'unsafe-inline';
+
+              img-src 
+                'self' 
+                data: 
+                https://*.razorpay.com;
+
+              frame-src 
+                'self' 
+                https://api.razorpay.com 
+                https://checkout.razorpay.com;
+
+              connect-src 
+                'self' 
+                ${process.env.NEXT_PUBLIC_API_URL} 
+                http://localhost:5000 
+                https://api.razorpay.com 
+                https://lumberjack.razorpay.com;
+
             `.replace(/\n/g, ""),
           },
         ],
