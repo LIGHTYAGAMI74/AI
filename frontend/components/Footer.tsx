@@ -40,19 +40,19 @@ export default function Footer() {
           <h3 className="font-black text-lg mb-3 uppercase">Connect</h3>
 
           <div className="flex justify-center md:justify-start gap-4">
-            <a href="https://instagram.com/gridixa" className="hover:text-yellow-400">
+            <a href="https://instagram.com/gridixa" className="hover:text-pink-400">
               <Instagram />
             </a>
-            <a href="https://linkedin.com/company/gridixa" className="hover:text-yellow-400">
+            <a href="https://linkedin.com/company/gridixa" className="hover:text-blue-400">
               <Linkedin />
             </a>
-            <a href="https://twitter.com/gridixa" className="hover:text-yellow-400">
+            <a href="https://twitter.com/gridixa" className="hover:text-blue-400">
               <Twitter />
             </a>
-            <a href="https://facebook.com/gridixa" className="hover:text-yellow-400">
+            <a href="https://facebook.com/gridixa" className="hover:text-blue-400">
               <Facebook />
             </a>
-            <a href="https://youtube.com/@gridixa" className="hover:text-yellow-400">
+            <a href="https://youtube.com/@gridixa" className="hover:text-red-400">
               <Youtube />
             </a>
             <a href="mailto:support@gridixa.in" className="hover:text-yellow-400">
