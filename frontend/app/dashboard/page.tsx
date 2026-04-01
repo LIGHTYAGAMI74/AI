@@ -11,34 +11,24 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const userRole = localStorage.getItem("userRole");
+    const user = localStorage.getItem("user");
 
-    if (!token) {
+    if (!token || !user) {
       router.replace("/login");
       return;
     }
 
-    setRole(userRole);
+    const parsed = JSON.parse(user);
+    setRole(parsed.role);
   }, [router]);
 
-  /* LOADING SCREEN */
   if (!role) {
     return (
-      <main className="flex min-h-screen w-full flex-col items-center justify-center bg-[#fffbeb] font-mono">
-        
-        <div className="h-14 w-14 md:h-16 md:w-16 animate-spin border-[8px] border-black border-t-pink-500 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"></div>
-
-        <h2 className="mt-6 text-xl md:text-2xl font-black italic uppercase tracking-tighter">
-          Syncing Reality...
-        </h2>
-
+      <main className="flex min-h-screen items-center justify-center bg-[#fffbeb] font-mono">
+        <div className="animate-spin border-8 border-black border-t-blue-500 h-16 w-16" />
       </main>
     );
   }
 
-  return (
-    <main className="min-h-screen">
-      {role === "admin" ? <AdminDashboard /> : <StudentDashboard />}
-    </main>
-  );
+  return role === "admin" ? <AdminDashboard /> : <StudentDashboard />;
 }

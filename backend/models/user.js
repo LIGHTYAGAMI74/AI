@@ -1,4 +1,4 @@
-// models/user.model.js
+// models/user.js
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
@@ -24,6 +24,36 @@ const userSchema = new mongoose.Schema({
     enum: ["pending", "completed"],
     default: "pending",
   },
+
+  progress: {
+    modules: [
+      {
+        moduleId: mongoose.Schema.Types.ObjectId,
+
+        completed: { type: Boolean, default: false },
+        unlocked: { type: Boolean, default: false },
+
+        chapters: [
+          {
+            chapterId: mongoose.Schema.Types.ObjectId,
+
+            completed: { type: Boolean, default: false },
+
+            topics: [
+              {
+                topicId: mongoose.Schema.Types.ObjectId,
+                completed: { type: Boolean, default: false },
+              }
+            ],
+
+            chapterTestPassed: { type: Boolean, default: false }
+          }
+        ],
+
+        moduleTestPassed: { type: Boolean, default: false }
+      }
+    ]
+  }
 
 }, { timestamps: true });
 

@@ -36,6 +36,7 @@ const nextConfig: NextConfig = {
                 'self' 
                 'unsafe-inline' 
                 https://checkout.razorpay.com 
+                https://fonts.googleapis.com
                 https://cdn.razorpay.com;
 
               style-src 

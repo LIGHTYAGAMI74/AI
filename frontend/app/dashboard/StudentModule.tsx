@@ -1,117 +1,193 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 export default function StudentModules() {
-  const [modules, setModules] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+  const [modules, setModules] = useState<any[]>([]);
+  const [chapters, setChapters] = useState<any[]>([]);
+  const [topics, setTopics] = useState<any[]>([]);
+  const [activeTopic, setActiveTopic] = useState<any>(null);
+
+  const [markdown, setMarkdown] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  // 🔹 STEP 1: FETCH MODULES
   useEffect(() => {
     const fetchModules = async () => {
-      try {
-        const token = localStorage.getItem("token");
+      const res = await fetch(`${API_URL}/api/module/all`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
-        const res = await fetch(`${API_URL}/api/module/all`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const data = await res.json();
-
-        if (Array.isArray(data)) setModules(data);
-      } catch (err) {
-        console.error("Module fetch error", err);
-      } finally {
-        setLoading(false);
-      }
+      const data = await res.json();
+      setModules(data || []);
+      setLoading(false);
     };
 
     fetchModules();
   }, []);
 
-  const handleModuleClick = async (module: any) => {
-    const token = localStorage.getItem("token");
-
-    try {
-      await fetch(`${API_URL}/api/auth/log-activity`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-    } catch (err) {
-      console.error("Activity log failed");
-    }
-
-    window.open(module.notionUrl, "_blank");
+  // 🔹 FETCH CHAPTERS
+  const openModule = async (moduleId: string) => {
+    setActiveTopic(null);
+    const res = await fetch(`${API_URL}/api/module/${moduleId}/chapters`);
+    const data = await res.json();
+    setChapters(data);
+    setTopics([]);
   };
 
-  /* LOADING SCREEN */
-  if (loading)
+  // 🔹 FETCH TOPICS
+  const openChapter = async (chapterId: string) => {
+    const res = await fetch(`${API_URL}/api/module/chapter/${chapterId}/topics`);
+    const data = await res.json();
+    setTopics(data);
+  };
+
+  // 🔹 FETCH MARKDOWN + VIDEO
+  const openTopic = async (topic: any) => {
+    setActiveTopic(topic);
+
+    const res = await fetch(topic.contentUrl);
+    const text = await res.text();
+
+    setMarkdown(text);
+
+    // 🔥 log activity (streak)
+    await fetch(`${API_URL}/api/auth/log-activity`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+  };
+
+  // 🔥 LOADING
+  if (loading) {
     return (
       <main className="flex items-center justify-center min-h-screen font-mono">
-        <h2 className="text-2xl md:text-4xl font-black italic uppercase animate-pulse">
-          Opening Archives...
+        <h2 className="text-4xl font-black italic animate-pulse">
+          Loading Knowledge Vault...
         </h2>
       </main>
     );
+  }
 
   return (
     <main className="max-w-6xl mx-auto px-4 font-mono text-black">
 
       {/* HEADER */}
-      <header className="mb-12 md:mb-16">
-        <h2 className="text-3xl md:text-6xl font-black uppercase italic tracking-tighter">
+      <header className="mb-12">
+        <h2 className="text-5xl font-black uppercase italic tracking-tighter">
           Knowledge{" "}
-          <span className="bg-yellow-400 px-3 md:px-4 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] inline-block">
+          <span className="bg-yellow-400 px-4 border-4 border-black">
             Vault
           </span>
         </h2>
       </header>
 
-      {/* MODULE GRID */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
-
-        {modules.length > 0 ? (
-          modules.map((m) => (
-            <article
+      {/* ================= MODULE LIST ================= */}
+      {!chapters.length && (
+        <section className="grid md:grid-cols-2 gap-8">
+          {modules.map((m) => (
+            <div
               key={m._id}
-              className="border-[6px] border-black p-6 md:p-10 bg-white shadow-[12px_12px_0px_0px_rgba(59,130,246,1)] hover:-rotate-1 transition-transform"
+              onClick={() => openModule(m._id)}
+              className="cursor-pointer border-[6px] border-black p-8 bg-white shadow-[10px_10px_0px_black] hover:-rotate-1 transition"
             >
-
-              <div className="h-2 w-full bg-black mb-5 md:mb-6" />
-
-              <h3 className="text-xl md:text-3xl font-black uppercase mb-4 md:mb-6 leading-tight italic">
-                {m.title}
-              </h3>
-
-              <p className="text-black font-bold mb-6 md:mb-10 text-xs md:text-sm bg-gray-100 p-3 md:p-4 border-2 border-black">
-                {m.description ||
-                  "TOP SECRET TRAINING DATA FOR NEURAL OPERATIVES."}
+              <h3 className="text-2xl font-black italic">{m.title}</h3>
+              <p className="mt-4 text-sm font-bold">
+                {m.description || "Secure Training Module"}
               </p>
+            </div>
+          ))}
+        </section>
+      )}
 
-              <button
-                onClick={() => handleModuleClick(m)}
-                className="w-full bg-pink-500 text-white px-6 md:px-8 py-4 md:py-5 border-[4px] border-black font-black uppercase text-sm md:text-lg shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:bg-black transition-all"
-              >
-                ACCESS DATA ↗
-              </button>
+      {/* ================= CHAPTER LIST ================= */}
+      {chapters.length > 0 && !topics.length && (
+        <section className="space-y-6">
+          <button
+            onClick={() => setChapters([])}
+            className="font-black underline"
+          >
+            ← Back to Modules
+          </button>
 
-            </article>
-          ))
-        ) : (
-          <div className="col-span-full border-[6px] md:border-[8px] border-dashed border-black p-10 md:p-20 text-center">
+          {chapters.map((c) => (
+            <div
+              key={c._id}
+              onClick={() => openChapter(c._id)}
+              className="cursor-pointer border-4 border-black p-6 bg-white hover:bg-yellow-50"
+            >
+              <h3 className="font-black text-xl">{c.title}</h3>
+            </div>
+          ))}
+        </section>
+      )}
 
-            <h4 className="font-black text-2xl md:text-5xl text-gray-300 italic uppercase">
-              Archives Empty
-            </h4>
+      {/* ================= TOPIC LIST ================= */}
+      {topics.length > 0 && !activeTopic && (
+        <section className="space-y-6">
+          <button
+            onClick={() => setTopics([])}
+            className="font-black underline"
+          >
+            ← Back to Chapters
+          </button>
 
+          {topics.map((t) => (
+            <div
+              key={t._id}
+              onClick={() => openTopic(t)}
+              className="cursor-pointer border-4 border-black p-6 bg-white hover:bg-blue-50"
+            >
+              <h3 className="font-black text-lg">{t.title}</h3>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {/* ================= TOPIC VIEW ================= */}
+      {activeTopic && (
+        <section className="space-y-8">
+
+          <button
+            onClick={() => setActiveTopic(null)}
+            className="font-black underline"
+          >
+            ← Back to Topics
+          </button>
+
+          {/* 🎥 YOUTUBE VIDEO */}
+          {activeTopic.videoUrl && (
+            <div className="aspect-video border-4 border-black">
+              <iframe
+                src={activeTopic.videoUrl}
+                className="w-full h-full"
+                allowFullScreen
+              />
+            </div>
+          )}
+
+          {/* 📄 MARKDOWN NOTES */}
+          <div className="prose max-w-none border-4 border-black p-6 bg-white">
+            <ReactMarkdown>{markdown}</ReactMarkdown>
           </div>
-        )}
 
-      </section>
+          {/* ✅ COMPLETE BUTTON */}
+          <button
+            className="bg-green-400 border-4 border-black px-6 py-3 font-black"
+            onClick={() => alert("Marked complete (backend next step)")}
+          >
+            MARK AS COMPLETE ✔
+          </button>
 
+        </section>
+      )}
     </main>
   );
 }

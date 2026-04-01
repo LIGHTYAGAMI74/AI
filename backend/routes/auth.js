@@ -12,7 +12,13 @@ const {
   verifyOtp,
   resetPassword,
   checkUser,
+  getProfile,
 } = require("../controllers/auth");
+
+const { authMiddleware } = require("../middleware/auth");
+
+// routes/auth.route.js
+router.get("/profile", authMiddleware, getProfile);
 
 // REGISTER FLOW
 router.post("/send-register-otp", sendRegisterOtp);

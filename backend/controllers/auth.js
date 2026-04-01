@@ -89,6 +89,22 @@ exports.login = async (req, res) => {
 };
 
 //////////////////////////////////////////////////////////
+// controllers/auth.controller.js
+//////////////////////////////////////////////////////////
+
+exports.getProfile = async (req, res) => {
+  try {
+    const user = await require("../models/user")
+      .findById(req.user.id)
+      .select("-password");
+
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+//////////////////////////////////////////////////////////
 // 🔐 FORGOT PASSWORD FLOW
 //////////////////////////////////////////////////////////
 

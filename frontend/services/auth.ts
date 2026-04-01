@@ -34,6 +34,13 @@ export async function loginUser(data: LoginPayload) {
   });
 }
 
+// 👤 GET PROFILE
+export async function getProfile() {
+  return apiRequest("/auth/profile", {
+    method: "GET",
+  });
+}
+
 // 📝 REGISTER
 export async function registerUser(data: RegisterPayload) {
   return apiRequest("/auth/register", {
