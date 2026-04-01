@@ -150,17 +150,49 @@ export default function StudentModules() {
     );
   }
 
+  const levelMap: Record<string, string> = {
+    "6-8": "1",
+    "9-10": "2",
+    "11-12": "3",
+  };
+
+  const renderBreadcrumb = () => {
+    if (!activeModule) return null;
+
+    const level = `Level ${levelMap[activeModule.level]}`;
+
+    return (
+      <div className="flex justify-end mb-4">
+        <div className="text-xs md:text-sm font-black uppercase bg-yellow-400 text-black px-4 py-2 border-2 border-black shadow-[4px_4px_0px_black]">
+
+          {level} → {activeModule.title}
+
+          {activeChapter && (
+            <> → {activeChapter.title}</>
+          )}
+
+          {activeChapter && activeTopicIndex !== null && (
+            <> → {activeChapter.topics[activeTopicIndex].title}</>
+          )}
+
+        </div>
+      </div>
+    );
+  };
+
   // ================= CHAPTER LIST =================
   if (!activeChapter) {
     return (
       <section className="space-y-6">
-
+        
         <button
           onClick={() => setActiveModule(null)}
           className="font-black underline"
         >
           ← Back to Modules
         </button>
+
+        {renderBreadcrumb()}
 
         <h2 className="text-3xl font-black">{activeModule.title}</h2>
 
@@ -184,13 +216,15 @@ export default function StudentModules() {
   if (activeTopicIndex === null) {
     return (
       <section className="space-y-6">
-
+        
         <button
           onClick={() => setActiveChapter(null)}
           className="font-black underline"
         >
           ← Back to Chapters
         </button>
+
+        {renderBreadcrumb()}
 
         {activeChapter.topics.map((t: any, i: number) => (
           <div
@@ -220,6 +254,8 @@ export default function StudentModules() {
       >
         ← Back to Topics
       </button>
+
+      {renderBreadcrumb()}
 
       {/* 🎥 VIDEO */}
       {topic.videoUrl && (
