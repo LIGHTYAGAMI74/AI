@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import StudentModules from "./StudentModule";
 import StudentTests from "./StudentTest";
-import ActivityGrid from "./ActivityGrid";
+import ActivityGrid from "../../components/ActivityGrid";
 import { getProfile } from "@/services/auth";
 import { useAuth } from "@/context/AuthContext";
 

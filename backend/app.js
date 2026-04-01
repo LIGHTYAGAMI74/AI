@@ -5,6 +5,7 @@ const cors = require("cors");
 
 const authRoutes = require("./routes/auth");
 const paymentRoutes = require("./routes/payment");
+const moduleRoutes = require("./routes/module");
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use(express.json());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/payment", paymentRoutes);
+app.use("/api/modules", moduleRoutes);
 
 // Health Check
 app.get("/", (req, res) => {

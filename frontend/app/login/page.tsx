@@ -120,7 +120,7 @@ export default function LoginPage() {
       </Link>
 
       {/* LOGIN CARD */}
-      <div className="w-full max-w-md bg-white border-4 md:border-[6px] border-black p-6 md:p-10 rounded-none shadow-[12px_12px_0px_0px_rgba(234,179,8,1)]">
+      <div className="w-full max-w-lg md:max-w-xl bg-white border-4 md:border-[6px] border-black p-6 md:p-10 rounded-none shadow-[12px_12px_0px_0px_rgba(234,179,8,1)]">
         <h1 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter mb-2 leading-none">
           Welcome Back<span className="text-yellow-500">.</span>
         </h1>
