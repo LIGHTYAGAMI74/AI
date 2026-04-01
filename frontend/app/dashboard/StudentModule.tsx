@@ -4,10 +4,13 @@ import React, { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
-export default function StudentModules() {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { getModules } from "@/services/module";
+import { logActivity } from "@/services/activity";
 
+export default function StudentModules() {
   const [modules, setModules] = useState<any[]>([]);
+  const [grouped, setGrouped] = useState<any>({});
+
   const [activeModule, setActiveModule] = useState<any>(null);
   const [activeChapter, setActiveChapter] = useState<any>(null);
   const [activeTopicIndex, setActiveTopicIndex] = useState<number | null>(null);
@@ -15,39 +18,61 @@ export default function StudentModules() {
   const [markdown, setMarkdown] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // 🔹 FETCH ALL DATA ONCE
+  // 🔹 FETCH + GROUP
   useEffect(() => {
     const fetchModules = async () => {
-      const res = await fetch(`${API_URL}/api/module/all`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      try {
+        const data = await getModules();
 
-      const data = await res.json();
-      setModules(data || []);
-      setLoading(false);
+        // 🔥 GROUP BY LEVEL
+        const groupedData: { [key: string]: any[] } = {
+          "6-8": [],
+          "9-10": [],
+          "11-12": [],
+        };
+
+        data.forEach((m: any) => {
+          const level = m.level as keyof typeof groupedData;
+          groupedData[level]?.push(m);
+        });
+
+        setModules(data);
+        setGrouped(groupedData);
+      } catch {
+        console.error("Module fetch failed");
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchModules();
   }, []);
 
-  // 🔹 LOAD TOPIC CONTENT
+  // 🔹 LOAD TOPIC SAFE
   const loadTopic = async (topic: any) => {
-    const res = await fetch(topic.contentUrl);
-    const text = await res.text();
-    setMarkdown(text);
+    try {
+      if (!topic.contentUrl) {
+        setMarkdown("## ⏳ Waiting for the notes.\nCome back later.");
+        return;
+      }
 
-    // 🔥 ACTIVITY TRACK
-    await fetch(`${API_URL}/api/auth/log-activity`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+      const res = await fetch(topic.contentUrl);
+      const text = await res.text();
+
+      // ❗ handle HTML response
+      if (text.startsWith("<!DOCTYPE")) {
+        setMarkdown("## ⚠️ Notes not available yet.");
+        return;
+      }
+
+      setMarkdown(text);
+
+      await logActivity();
+    } catch {
+      setMarkdown("## ⚠️ Failed to load content.");
+    }
   };
 
-  // 🔹 WHEN TOPIC CHANGES
   useEffect(() => {
     if (activeChapter && activeTopicIndex !== null) {
       const topic = activeChapter.topics[activeTopicIndex];
@@ -55,6 +80,7 @@ export default function StudentModules() {
     }
   }, [activeTopicIndex]);
 
+  // 🔄 LOADING
   if (loading) {
     return (
       <main className="flex items-center justify-center min-h-screen">
@@ -68,17 +94,59 @@ export default function StudentModules() {
   // ================= MODULE LIST =================
   if (!activeModule) {
     return (
-      <section className="grid md:grid-cols-2 gap-8">
-        {modules.map((m) => (
-          <div
-            key={m._id}
-            onClick={() => setActiveModule(m)}
-            className="cursor-pointer border-[6px] border-black p-8 bg-white shadow-[10px_10px_0px_black] hover:-rotate-1"
-          >
-            <h3 className="text-2xl font-black">{m.title}</h3>
-          </div>
-        ))}
-      </section>
+      <div className="flex">
+
+        {/* 📚 MAIN CONTENT */}
+        <div className="flex-1 space-y-12 pr-6">
+
+          {['6-8', '9-10', '11-12'].map((level) => {
+            const levelMap: Record<string, string> = {
+              '6-8': '1',
+              '9-10': '2',
+              '11-12': '3',
+            };
+            const displayValue = levelMap[level];
+
+            if (!displayValue || grouped[level]?.length === 0) {
+              return null;
+            }
+
+            return (
+              <div key={level} className="space-y-6">
+
+                {/* LEVEL HEADER */}
+                <h2 className="text-3xl font-black uppercase border-b-4 border-black pb-2">
+                  Level {displayValue}
+                </h2>
+
+                {/* MODULES */}
+                {grouped[level].map((m: any) => (
+                  <div
+                    key={m._id}
+                    onClick={() => setActiveModule(m)}
+                    className="cursor-pointer border-[6px] border-black p-6 bg-white shadow-[8px_8px_0px_black] hover:-rotate-1 transition"
+                  >
+                    <h3 className="text-xl font-black mb-3">{m.title}</h3>
+
+                    {/* 🔥 CHAPTER PREVIEW */}
+                    <ul className="text-sm font-bold text-gray-600 space-y-1">
+                      {m.chapters.slice(0, 3).map((c: any, i: number) => (
+                        <li key={i}>• {c.title}</li>
+                      ))}
+                      {m.chapters.length > 3 && (
+                        <li>+ more...</li>
+                      )}
+                    </ul>
+                  </div>
+                ))}
+
+              </div>
+            )
+          })}
+
+        </div>
+
+      </div>
     );
   }
 
@@ -86,7 +154,15 @@ export default function StudentModules() {
   if (!activeChapter) {
     return (
       <section className="space-y-6">
-        <button onClick={() => setActiveModule(null)}>← Back</button>
+
+        <button
+          onClick={() => setActiveModule(null)}
+          className="font-black underline"
+        >
+          ← Back to Modules
+        </button>
+
+        <h2 className="text-3xl font-black">{activeModule.title}</h2>
 
         {activeModule.chapters.map((c: any) => (
           <div
@@ -95,7 +171,7 @@ export default function StudentModules() {
               setActiveChapter(c);
               setActiveTopicIndex(null);
             }}
-            className="border-4 p-6 bg-white cursor-pointer"
+            className="border-4 p-6 bg-white cursor-pointer hover:bg-yellow-50"
           >
             {c.title}
           </div>
@@ -108,13 +184,19 @@ export default function StudentModules() {
   if (activeTopicIndex === null) {
     return (
       <section className="space-y-6">
-        <button onClick={() => setActiveChapter(null)}>← Back</button>
+
+        <button
+          onClick={() => setActiveChapter(null)}
+          className="font-black underline"
+        >
+          ← Back to Chapters
+        </button>
 
         {activeChapter.topics.map((t: any, i: number) => (
           <div
             key={t._id}
             onClick={() => setActiveTopicIndex(i)}
-            className="border-4 p-6 bg-white cursor-pointer"
+            className="border-4 p-6 bg-white cursor-pointer hover:bg-blue-50"
           >
             {t.title}
           </div>
@@ -126,30 +208,32 @@ export default function StudentModules() {
   // ================= TOPIC VIEW =================
   const topic = activeChapter.topics[activeTopicIndex];
 
-  const isLast = activeTopicIndex === activeChapter.topics.length - 1;
   const isFirst = activeTopicIndex === 0;
+  const isLast = activeTopicIndex === activeChapter.topics.length - 1;
 
   return (
     <section className="space-y-8">
 
-      {/* BACK */}
-      <button onClick={() => setActiveTopicIndex(null)}>
+      <button
+        onClick={() => setActiveTopicIndex(null)}
+        className="font-black underline"
+      >
         ← Back to Topics
       </button>
 
-      {/* VIDEO */}
+      {/* 🎥 VIDEO */}
       {topic.videoUrl && (
         <div className="aspect-video border-4 border-black">
           <iframe src={topic.videoUrl} className="w-full h-full" />
         </div>
       )}
 
-      {/* NOTES */}
+      {/* 📄 MARKDOWN */}
       <div className="prose max-w-none border-4 border-black p-6 bg-white">
         <ReactMarkdown>{markdown}</ReactMarkdown>
       </div>
 
-      {/* NAVIGATION */}
+      {/* 🔄 NAV */}
       <div className="flex justify-between">
 
         <button
@@ -165,7 +249,6 @@ export default function StudentModules() {
             if (!isLast) {
               setActiveTopicIndex((prev) => prev! + 1);
             } else {
-              // 🔥 END OF CHAPTER → PRACTICE
               alert("Start Practice (5 questions)");
               setActiveTopicIndex(null);
               setActiveChapter(null);
