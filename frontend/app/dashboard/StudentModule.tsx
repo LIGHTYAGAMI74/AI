@@ -2,6 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
+
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 import { getModules } from "@/services/module";
@@ -265,8 +268,51 @@ export default function StudentModules() {
       )}
 
       {/* 📄 MARKDOWN */}
-      <div className="prose max-w-none border-4 border-black p-6 bg-white">
-        <ReactMarkdown>{markdown}</ReactMarkdown>
+      <div className="markdown-body border-4 border-black p-6 md:p-10 bg-white">
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          rehypePlugins={[rehypeRaw]}
+          components={{
+            h1: ({node, ...props}) => <h1 className="text-4xl md:text-5xl font-bold mt-6 mb-4" {...props} />,
+            h2: ({node, ...props}) => <h2 className="text-3xl md:text-4xl font-semibold mt-6 mb-3" {...props} />,
+            h3: ({node, ...props}) => <h3 className="text-2xl md:text-3xl font-semibold mt-5 mb-3" {...props} />,
+            h4: ({node, ...props}) => <h4 className="text-xl font-semibold mt-4 mb-2" {...props} />,
+            p: ({node, ...props}) => <p className="text-base md:text-lg leading-relaxed mb-4 text-gray-800" {...props} />,
+            ul: ({node, ...props}) => <ul className="list-disc pl-6 mb-4 space-y-2" {...props} />,
+            ol: ({node, ...props}) => <ol className="list-decimal pl-6 mb-4 space-y-2" {...props} />,
+            li: ({node, ...props}) => <li className="text-base md:text-lg" {...props} />,
+            strong: ({node, ...props}) => <strong className="font-semibold text-black" {...props} />,
+            em: ({node, ...props}) => <em className="italic text-gray-700" {...props} />,
+            a: ({node, ...props}) => <a className="text-blue-600 underline font-medium" target="_blank" {...props} />,
+            blockquote: ({node, ...props}) => (
+              <blockquote className="border-l-4 border-black pl-4 italic text-gray-600 my-4" {...props} />
+            ),
+            code({inline, className, children, ...props}: any) {
+              return inline ? (
+                <code className="bg-gray-200 px-2 py-1 rounded text-sm" {...props}>
+                  {children}
+                </code>
+              ) : (
+                <pre className="bg-black text-green-400 p-4 rounded-lg overflow-x-auto my-4">
+                  <code {...props}>{children}</code>
+                </pre>
+              );
+            },
+            table: ({node, ...props}) => (
+              <div className="overflow-x-auto my-6">
+                <table className="min-w-full border-2 border-black" {...props} />
+              </div>
+            ),
+            th: ({node, ...props}) => (
+              <th className="border border-black bg-yellow-300 px-4 py-2 text-left font-bold" {...props} />
+            ),
+            td: ({node, ...props}) => (
+              <td className="border border-black px-4 py-2" {...props} />
+            ),
+          }}
+        >
+          {markdown}
+        </ReactMarkdown>
       </div>
 
       {/* 🔄 NAV */}

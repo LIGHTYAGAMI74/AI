@@ -37,6 +37,7 @@ const nextConfig: NextConfig = {
                 'unsafe-inline' 
                 https://checkout.razorpay.com 
                 https://fonts.googleapis.com
+                https://gridixa-ai-notes.s3.ap-south-1.amazonaws.com
                 https://cdn.razorpay.com;
 
               style-src 
@@ -58,6 +59,8 @@ const nextConfig: NextConfig = {
                 ${process.env.NEXT_PUBLIC_API_URL} 
                 http://localhost:5000 
                 https://api.razorpay.com 
+                https://gridixa-ai-notes.s3.ap-south-1.amazonaws.com
+                https://fonts.googleapis.com
                 https://lumberjack.razorpay.com;
 
             `.replace(/\n/g, ""),
