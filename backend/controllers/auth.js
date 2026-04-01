@@ -89,7 +89,7 @@ exports.login = async (req, res) => {
 };
 
 //////////////////////////////////////////////////////////
-// controllers/auth.controller.js
+// Log Activity
 //////////////////////////////////////////////////////////
 
 exports.getProfile = async (req, res) => {
@@ -99,6 +99,30 @@ exports.getProfile = async (req, res) => {
       .select("-password");
 
     res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+//////////////////////////////////////////////////////////
+// Log Activity
+//////////////////////////////////////////////////////////
+
+exports.logActivity = async (req, res) => {
+  try {
+    const User = require("../models/user");
+
+    const today = new Date().toISOString().split("T")[0];
+
+    const user = await User.findById(req.user.id);
+
+    if (!user.stats.activityLog.includes(today)) {
+      user.stats.activityLog.push(today);
+      user.stats.activityDays = user.stats.activityLog.length;
+      await user.save();
+    }
+
+    res.json({ success: true });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

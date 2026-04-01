@@ -13,12 +13,14 @@ const {
   resetPassword,
   checkUser,
   getProfile,
+  logActivity
 } = require("../controllers/auth");
 
 const { authMiddleware } = require("../middleware/auth");
 
 // routes/auth.route.js
 router.get("/profile", authMiddleware, getProfile);
+router.post("/log-activity", authMiddleware, logActivity);
 
 // REGISTER FLOW
 router.post("/send-register-otp", sendRegisterOtp);

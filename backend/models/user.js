@@ -53,7 +53,28 @@ const userSchema = new mongoose.Schema({
         moduleTestPassed: { type: Boolean, default: false }
       }
     ]
-  }
+  },
+
+  stats: {
+    activityLog: {
+      type: [String], // YYYY-MM-DD
+      default: [],
+    },
+    activityDays: {
+      type: Number,
+      default: 0,
+    },
+    testHistory: {
+      type: [
+        {
+          testName: String,
+          score: Number,
+          date: Date,
+        }
+      ],
+      default: [],
+    },
+  },
 
 }, { timestamps: true });
 

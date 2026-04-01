@@ -32,7 +32,7 @@ const NeuralAnimation = () => {
         className="absolute inset-0 bg-yellow-400 border-[6px] border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
       />
       <div className="z-10 text-center">
-        <h2 className="text-3xl font-black uppercase">Initializing...</h2>
+        <h2 className="text-3xl font-black text-black uppercase">Initializing...</h2>
         <p className="text-xs mt-2 font-black bg-white px-2 border-2 border-black">
           AI OLYMPIAD SYSTEM
         </p>
