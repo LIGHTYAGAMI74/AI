@@ -29,6 +29,10 @@ export default function StudentDashboard() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [activeTab]);
+
   // 🔐 FETCH USER
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -165,6 +169,7 @@ export default function StudentDashboard() {
             <button
               key={tab.id}
               onClick={() => {
+                window.scrollTo({ top: 0, behavior: "smooth" });
                 setActiveTab(tab.id);
                 setSidebarOpen(false);
               }}
@@ -227,7 +232,10 @@ export default function StudentDashboard() {
               <div className="grid md:grid-cols-3 gap-6">
 
                 <div
-                  onClick={() => setActiveTab("modules")}
+                  onClick={() => {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                    setActiveTab("modules");
+                  }}
                   className="cursor-pointer bg-yellow-400 p-6 border-4 border-black font-black flex flex-col gap-3 hover:bg-yellow-300 hover:-translate-y-1 hover:shadow-[6px_6px_0px_black] transition-all"
                 >
                   <Book size={28} />
@@ -235,7 +243,10 @@ export default function StudentDashboard() {
                 </div>
 
                 <div
-                  onClick={() => setActiveTab("tests")}
+                  onClick={() => {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                    setActiveTab("tests");
+                  }}
                   className="cursor-pointer bg-pink-500 text-white p-6 border-4 border-black font-black flex flex-col gap-3 hover:bg-pink-600 hover:-translate-y-1 hover:shadow-[6px_6px_0px_black] transition-all"
                 >
                   <PenTool size={28} />

@@ -537,6 +537,10 @@ export default function StudentModules({ onActivity }: { onActivity?: () => void
     );
   };
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [activeModule, activeChapter, activeTopicIndex]);
+
   const loadTopic = async (topic: any) => {
     setContentLoading(true);
 
@@ -644,7 +648,7 @@ export default function StudentModules({ onActivity }: { onActivity?: () => void
             return (
               <div key={level} className="space-y-6">
                 <h2 className="text-3xl font-black uppercase border-b-4 border-black pb-2">
-                  Level {levelMap[level]} (Class {level})
+                  Level {levelMap[level]}
                 </h2>
 
                 {grouped[level].map((m: any) => {
@@ -654,7 +658,11 @@ export default function StudentModules({ onActivity }: { onActivity?: () => void
                   return (
                     <div
                       key={m._id}
-                      onClick={() => unlocked && setActiveModule(m)}
+                      onClick={() => {
+                        if (!unlocked) return;
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                        setActiveModule(m);
+                      }}
                       className={`border-[6px] border-black p-6 shadow-[8px_8px_0px_black] transition ${
                         unlocked
                           ? "bg-white hover:-rotate-1 hover:bg-yellow-50 cursor-pointer"
@@ -702,7 +710,10 @@ export default function StudentModules({ onActivity }: { onActivity?: () => void
     return (
       <section className="space-y-6">
         <button
-          onClick={() => setActiveModule(null)}
+          onClick={() => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            setActiveModule(null);
+          }}
           className="inline-flex items-center gap-2 font-black underline underline-offset-4 hover:text-blue-600"
         >
           ← Back to Modules
@@ -721,6 +732,7 @@ export default function StudentModules({ onActivity }: { onActivity?: () => void
               <div
                 key={c.chapterKey}
                 onClick={() => {
+                  window.scrollTo({ top: 0, behavior: "smooth" });
                   setActiveChapter(c);
                   setActiveTopicIndex(null);
                 }}
@@ -751,7 +763,10 @@ export default function StudentModules({ onActivity }: { onActivity?: () => void
     return (
       <section className="space-y-6">
         <button
-          onClick={() => setActiveChapter(null)}
+          onClick={() => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            setActiveChapter(null);
+          }}
           className="inline-flex items-center gap-2 font-black underline underline-offset-4 hover:text-blue-600"
         >
           ← Back to Chapters
@@ -761,27 +776,39 @@ export default function StudentModules({ onActivity }: { onActivity?: () => void
 
         <div className="space-y-4">
           {activeChapter.topics?.map((t: any, i: number) => {
+            const chapterProgress = getChapterProgress(
+              activeModule._id,
+              activeChapter.chapterKey
+            );
+
             const topicProgress = getTopicProgress(
               activeModule._id,
               activeChapter.chapterKey, 
               t._id
             );
 
+            // 🔥 MAIN LOGIC
+            const isCompleted =
+              chapterProgress?.chapterTestPassed || topicProgress?.completed;
+
             return (
               <div
                 key={t._id}
-                onClick={() => setActiveTopicIndex(i)}
+                onClick={() => {
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                  setActiveTopicIndex(i);
+                }}
                 className={`border-4 p-6 cursor-pointer transition ${
-                  topicProgress?.completed
+                  isCompleted
                     ? "bg-green-100 hover:bg-green-200"
                     : "bg-white hover:bg-blue-50"
                 }`}
               >
                 <div className="flex items-center justify-between gap-4">
                   <span className="font-bold">{t.title}</span>
-                  {topicProgress?.completed && (
+                  {isCompleted && (
                     <span className="text-xs font-black bg-green-100 border-2 border-black px-3 py-1">
-                      Completed
+                      Done
                     </span>
                   )}
                 </div>
@@ -801,7 +828,10 @@ export default function StudentModules({ onActivity }: { onActivity?: () => void
   return (
     <section className="space-y-8">
       <button
-        onClick={() => setActiveTopicIndex(null)}
+        onClick={() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          setActiveTopicIndex(null);
+        }}
         className="inline-flex items-center gap-2 font-black underline underline-offset-4 hover:text-blue-600"
       >
         ← Back to Topics
