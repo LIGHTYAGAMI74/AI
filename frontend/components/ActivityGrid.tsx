@@ -8,7 +8,9 @@ export default function ActivityGrid({ activityLog = [] }: ActivityProps) {
   const today = new Date();
 
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString("en-CA"); // YYYY-MM-DD format
+    return date.toLocaleDateString("en-CA", {
+      timeZone: "Asia/Kolkata",
+    });
   };
 
   const days = Array.from({ length: 100 }, (_, i) => {

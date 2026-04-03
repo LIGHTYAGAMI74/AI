@@ -57,6 +57,29 @@ export default function StudentDashboard() {
     fetchUser();
   }, []);
 
+  const updateActivityLocally = () => {
+    const today = new Date().toLocaleDateString("en-CA", {
+      timeZone: "Asia/Kolkata",
+    });
+
+    setUser((prev: any) => {
+      if (!prev) return prev;
+
+      const log = prev.stats?.activityLog || [];
+
+      if (log.includes(today)) return prev;
+
+      return {
+        ...prev,
+        stats: {
+          ...prev.stats,
+          activityLog: [...log, today],
+          activityDays: log.length + 1,
+        },
+      };
+    });
+  };
+
   // 🔄 LOADING UI
   if (loading) {
     return (
@@ -245,7 +268,9 @@ export default function StudentDashboard() {
           )}
 
           {/* MODULES */}
-          {activeTab === "modules" && <StudentModules />}
+          {activeTab === "modules" && (
+            <StudentModules onActivity={updateActivityLocally} />
+          )}
 
           {/* TESTS */}
           {activeTab === "tests" && <StudentTests />}

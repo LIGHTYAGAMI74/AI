@@ -421,7 +421,7 @@ function ChapterTestModal({
   );
 }
 
-export default function StudentModules() {
+export default function StudentModules({ onActivity }: { onActivity?: () => void }) {
   const [modules, setModules] = useState<any[]>([]);
   const [grouped, setGrouped] = useState<any>({
     "6-8": [],
@@ -446,12 +446,6 @@ export default function StudentModules() {
   };
 
   const topRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (activeTopicIndex !== null) {
-      topRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [activeTopicIndex]);
 
   // FETCH MODULES + PROGRESS
   useEffect(() => {
@@ -562,11 +556,11 @@ export default function StudentModules() {
 
       setMarkdown(text);
       await logActivity();
+      onActivity?.(); 
     } catch {
       setMarkdown("## ⚠️ Failed to load content.");
     } finally {
       setContentLoading(false);
-      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -598,8 +592,10 @@ export default function StudentModules() {
       const isLast = activeTopicIndex === activeChapter.topics.length - 1;
 
       if (!isLast) {
-        setActiveTopicIndex((prev) => (prev ?? 0) + 1);
-      } else {
+      topRef.current?.scrollIntoView({ behavior: "smooth" });
+
+      setActiveTopicIndex((prev) => (prev ?? 0) + 1);
+    } else {
         // ✅ ONLY open test (DO NOT mark chapter here)
         setShowTestModal(true);
       }
@@ -685,10 +681,10 @@ export default function StudentModules() {
                       </div>
 
                       <ul className="text-sm font-bold text-gray-600 space-y-1 mt-4">
-                        {m.chapters?.slice(0, 3).map((c: any, i: number) => (
+                        {m.chapters?.slice(0, 4).map((c: any, i: number) => (
                           <li key={c.chapterKey || i}>• {c.title}</li>
                         ))}
-                        {m.chapters?.length > 3 && <li>+ more...</li>}
+                        {m.chapters?.length > 4 && <li>+ more...</li>}
                       </ul>
                     </div>
                   );
