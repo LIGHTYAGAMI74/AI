@@ -27,8 +27,6 @@ const getChapterProgress = (module, chapterId) => {
     (c) => c.chapterId === chapterId
   );
 
-  console.log("Received chapterId:", chapterId);
-
   if (!chapter) {
     chapter = {
       chapterId, // now this is chapterKey (STRING)

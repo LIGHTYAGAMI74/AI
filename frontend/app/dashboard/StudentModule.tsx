@@ -801,7 +801,6 @@ export default function StudentModules() {
   const topic = activeChapter.topics[activeTopicIndex];
   const isFirst = activeTopicIndex === 0;
   const isLast = activeTopicIndex === activeChapter.topics.length - 1;
-  console.log("Sending chapterKey:", activeChapter.chapterKey);
 
   return (
     <section className="space-y-8">

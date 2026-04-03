@@ -112,7 +112,9 @@ exports.logActivity = async (req, res) => {
   try {
     const User = require("../models/user");
 
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date().toLocaleDateString("en-CA", {
+      timeZone: "Asia/Kolkata",
+    });
 
     const user = await User.findById(req.user.id);
 
