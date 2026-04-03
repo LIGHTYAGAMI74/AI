@@ -7,10 +7,14 @@ interface ActivityProps {
 export default function ActivityGrid({ activityLog = [] }: ActivityProps) {
   const today = new Date();
 
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString("en-CA"); // YYYY-MM-DD format
+  };
+
   const days = Array.from({ length: 100 }, (_, i) => {
     const d = new Date();
     d.setDate(today.getDate() - i);
-    return d.toISOString().split("T")[0];
+    return formatDate(d);
   }).reverse();
 
   // 🔥 STREAK CALCULATION
@@ -19,8 +23,8 @@ export default function ActivityGrid({ activityLog = [] }: ActivityProps) {
     let current = new Date();
 
     while (true) {
-      const dateStr = current.toISOString().split("T")[0];
-      if (dateStr && activityLog.includes(dateStr)) {
+      const dateStr = formatDate(current);
+      if (activityLog.includes(dateStr)) {
         streak++;
         current.setDate(current.getDate() - 1);
       } else break;
@@ -57,7 +61,7 @@ export default function ActivityGrid({ activityLog = [] }: ActivityProps) {
       <div className="flex flex-wrap gap-2">
         {days.map((date) => {
           const isActive = date ? activityLog.includes(date) : false;
-          const isToday = date === today.toISOString().split("T")[0];
+          const isToday = date === formatDate(today);
 
           return (
             <div

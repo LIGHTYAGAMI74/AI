@@ -119,7 +119,7 @@ export default function StudentModules() {
 
                 {/* LEVEL HEADER */}
                 <h2 className="text-3xl font-black uppercase border-b-4 border-black pb-2">
-                  Level {displayValue}
+                  Level {displayValue} (Class {level})
                 </h2>
 
                 {/* MODULES */}
@@ -273,9 +273,9 @@ export default function StudentModules() {
           remarkPlugins={[remarkGfm]}
           rehypePlugins={[rehypeRaw]}
           components={{
-            h1: ({node, ...props}) => <h1 className="text-4xl md:text-5xl font-bold mt-6 mb-4" {...props} />,
-            h2: ({node, ...props}) => <h2 className="text-3xl md:text-4xl font-semibold mt-6 mb-3" {...props} />,
-            h3: ({node, ...props}) => <h3 className="text-2xl md:text-3xl font-semibold mt-5 mb-3" {...props} />,
+            h1: ({node, ...props}) => <h1 className="text-5xl md:text-3xl font-bold mt-6 mb-4" {...props} />,
+            h2: ({node, ...props}) => <h2 className="text-4xl md:text-2xl font-semibold mt-6 mb-3" {...props} />,
+            h3: ({node, ...props}) => <h3 className="text-3xl md:text-xl font-semibold mt-5 mb-3" {...props} />,
             h4: ({node, ...props}) => <h4 className="text-xl font-semibold mt-4 mb-2" {...props} />,
             p: ({node, ...props}) => <p className="text-base md:text-lg leading-relaxed mb-4 text-gray-800" {...props} />,
             ul: ({node, ...props}) => <ul className="list-disc pl-6 mb-4 space-y-2" {...props} />,

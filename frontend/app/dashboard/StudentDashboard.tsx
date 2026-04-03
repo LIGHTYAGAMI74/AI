@@ -193,7 +193,7 @@ export default function StudentDashboard() {
               {/* HEADER */}
               <div className="border-[6px] border-black p-8 bg-white shadow-[10px_10px_0px_black]">
                 <h2 className="text-4xl font-black italic uppercase">
-                  Welcome, {user?.name}
+                  Welcome {user?.name}!
                 </h2>
                 <p className="font-bold mt-2 text-gray-600">
                   Continue your AI learning journey.
@@ -216,7 +216,7 @@ export default function StudentDashboard() {
                   className="cursor-pointer bg-pink-500 text-white p-6 border-4 border-black font-black flex flex-col gap-3 hover:bg-pink-600 hover:-translate-y-1 hover:shadow-[6px_6px_0px_black] transition-all"
                 >
                   <PenTool size={28} />
-                  Take Test
+                  Take Module Test
                 </div>
 
                 <div className="bg-blue-400 p-6 border-4 border-black font-black flex flex-col gap-3 hover:bg-blue-500 hover:-translate-y-1 hover:shadow-[6px_6px_0px_black] transition-all">
