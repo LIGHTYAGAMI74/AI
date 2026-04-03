@@ -84,7 +84,8 @@ export default function StudentTests() {
         <h2 className="text-3xl md:text-6xl font-black text-black uppercase italic tracking-tighter">
           Module{" "}
           <span className="bg-pink-500 text-white px-3 md:px-4 border-4 border-black">
-            Tests
+            Tests 
+            <span className="ml-2 inline-block animate-pulse"></span>
           </span>
         </h2>
       </header>
@@ -111,12 +112,12 @@ export default function StudentTests() {
                 return (
                   <article
                     key={m._id}
-                    className="group relative border-[6px] border-black p-6 md:p-10 bg-white shadow-[12px_12px_0px_black] hover:bg-yellow-50 transition overflow-hidden"
+                    className="group relative border-[6px] border-black p-6 md:p-10 bg-white shadow-[12px_12px_0px_black] hover:bg-yellow-400 transition overflow-hidden"
                   >
 
                     {/* BACKGROUND TEXT */}
                     <div className="absolute -right-4 -top-4 text-gray-100 font-black text-7xl md:text-9xl opacity-20 pointer-events-none group-hover:text-pink-100 uppercase">
-                      AI
+                      AI 
                     </div>
 
                     <h3 className="text-2xl md:text-4xl font-black uppercase italic mb-4 relative z-10">
@@ -139,7 +140,7 @@ export default function StudentTests() {
                     {/* CTA */}
                     <button
                       onClick={() => setActiveTest(m)}
-                      className="w-full bg-blue-600 text-white py-4 md:py-6 border-[4px] border-black font-black uppercase text-lg md:text-xl shadow-[8px_8px_0px_black] hover:bg-black transition active:translate-y-1 active:shadow-none relative z-10"
+                      className="w-full bg-blue-600 text-white py-4 md:py-6 border-[4px] border-black font-black uppercase text-lg md:text-xl shadow-[8px_8px_0px_black] hover:bg-white hover:text-black transition active:translate-y-1 active:shadow-none relative z-10"
                     >
                       START MODULE TEST ↗
                     </button>
