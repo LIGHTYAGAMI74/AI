@@ -36,14 +36,16 @@ const nextConfig: NextConfig = {
                 'self' 
                 'unsafe-inline' 
                 https://checkout.razorpay.com 
-                https://fonts.googleapis.com
-                https://gridixa-ai-notes.s3.ap-south-1.amazonaws.com
                 https://cdn.razorpay.com;
 
               style-src 
                 'self' 
-                'unsafe-inline';
+                'unsafe-inline' 
                 https://fonts.googleapis.com;
+
+              font-src 
+                'self' 
+                https://fonts.gstatic.com;
 
               img-src 
                 'self' 
@@ -61,7 +63,6 @@ const nextConfig: NextConfig = {
                 http://localhost:5000 
                 https://api.razorpay.com 
                 https://gridixa-ai-notes.s3.ap-south-1.amazonaws.com
-                https://fonts.googleapis.com
                 https://lumberjack.razorpay.com;
 
             `.replace(/\n/g, ""),

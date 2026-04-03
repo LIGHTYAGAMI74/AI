@@ -70,9 +70,14 @@ const userSchema = new mongoose.Schema({
     testHistory: {
       type: [
         {
-          testName: String,
-          score: Number,
-          date: Date,
+          moduleId: mongoose.Schema.Types.ObjectId, // 🔥 IMPORTANT
+          moduleTitle: String, // for UI (avoid extra queries)
+
+          bestScore: Number, // 🔥 only best score stored
+          attempts: { type: Number, default: 1 },
+
+          lastScore: Number, // optional but useful
+          lastAttemptedAt: Date,
         }
       ],
       default: [],

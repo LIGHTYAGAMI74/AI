@@ -13,6 +13,8 @@ const chapterSchema = new mongoose.Schema({
   practiceUrl: String,
 });
 
+// models/module.js
+
 const moduleSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: String,
@@ -23,9 +25,23 @@ const moduleSchema = new mongoose.Schema({
     required: true,
   },
 
-  order: Number, // for sorting modules
+  order: Number,
 
   chapters: [chapterSchema],
+
+  // 🔥 TEST CONFIG
+  moduleTestUrl: String,
+
+  moduleTestQuestions: {
+    type: Number,
+    default: 30,
+  },
+
+  moduleTestDuration: {
+    type: Number,
+    default: 15, // minutes
+  },
+
 }, { timestamps: true });
 
 module.exports = mongoose.model("Module", moduleSchema);

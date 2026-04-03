@@ -6,6 +6,7 @@ import { Brain, Trophy, BookOpen, Target } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 // 🔥 Reusable animation variants
 const fadeUp = {
@@ -47,7 +48,6 @@ export default function HomePage() {
 
   useEffect(() => {
     setMounted(true);
-
     const hasSeenIntro = sessionStorage.getItem("hasSeenIntro");
     if (!hasSeenIntro) {
       setShowIntro(true);
@@ -56,6 +56,18 @@ export default function HomePage() {
       return () => clearTimeout(timer);
     }
   }, []);
+
+  // ✅ ADD THIS
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  const pathname = usePathname();
+
+  // ✅ ADD THIS
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [pathname]);
 
   if (!mounted) return <div className="min-h-screen bg-[#fff9e6]" />;
 
@@ -366,7 +378,7 @@ export default function HomePage() {
               Register now and start your AI journey.
             </p>
 
-            <Link href="/login">
+            <Link href="/register">
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 className="group relative px-10 md:px-12 py-4 md:py-6 bg-pink-400 text-black font-black uppercase text-xl md:text-2xl border-[4px] border-black hover:bg-white transition-colors"
