@@ -16,10 +16,14 @@ export async function markTopicComplete(moduleId: string, chapterId: string, top
 }
 
 // 🔥 CHAPTER PRACTICE ATTEMPT
-export async function markChapterPractice(moduleId: string, chapterId: string) {
+export async function markChapterPractice(
+  moduleId: string,
+  chapterId: string,
+  totalChapters: number
+) {
   return apiRequest("/progress/chapter-practice", {
     method: "POST",
-    body: JSON.stringify({ moduleId, chapterId }),
+    body: JSON.stringify({ moduleId, chapterId, totalChapters }),
   });
 }
 

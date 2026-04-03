@@ -35,18 +35,21 @@ const userSchema = new mongoose.Schema({
 
         chapters: [
           {
-            chapterId: mongoose.Schema.Types.ObjectId,
-
-            completed: { type: Boolean, default: false },
+            chapterId: String,
 
             topics: [
               {
-                topicId: mongoose.Schema.Types.ObjectId,
+                topicId: String,
                 completed: { type: Boolean, default: false },
               }
             ],
 
-            chapterTestPassed: { type: Boolean, default: false }
+            // 🔥 NEW
+            topicCount: Number,
+            topicsCompleted: { type: Number, default: 0 },
+
+            chapterTestPassed: { type: Boolean, default: false },
+            lastAttemptedAt: Date
           }
         ],
 

@@ -7,9 +7,10 @@ const topicSchema = new mongoose.Schema({
 });
 
 const chapterSchema = new mongoose.Schema({
+  chapterKey: { type: String, required: true }, // 🔥 ADD THIS
   title: String,
   topics: [topicSchema],
-  practiceUrl: String, // md for 5Q
+  practiceUrl: String,
 });
 
 const moduleSchema = new mongoose.Schema({
