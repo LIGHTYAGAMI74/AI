@@ -180,3 +180,37 @@ exports.checkUser = async (req, res) => {
 
   res.json({ exists: false });
 };
+
+// UPDATE PROFILE
+exports.updateProfile = async (req, res) => {
+  try {
+    const allowedFields = [
+      "name",
+      "studentPhone",
+      "parentPhone",
+      "parentEmail",
+      "school",
+      "city",
+      "state"
+    ];
+
+    const updates = {};
+
+    allowedFields.forEach((field) => {
+      if (req.body[field] !== undefined) {
+        updates[field] = req.body[field];
+      }
+    });
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      updates,
+      { new: true }
+    ).select("-password");
+
+    res.json(user);
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

@@ -41,6 +41,14 @@ export async function getProfile() {
   });
 }
 
+// ✏️ UPDATE PROFILE
+export async function updateProfile(data: any) {
+  return apiRequest("/auth/profile", {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
 // 📝 REGISTER
 export async function registerUser(data: RegisterPayload) {
   return apiRequest("/auth/register", {

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import StudentModules from "./StudentModule";
 import StudentTests from "./StudentTest";
+import StudentProfile from "./StudentProfile";
 import ActivityGrid from "../../components/ActivityGrid";
 import { getProfile } from "@/services/auth";
 import { useAuth } from "@/context/AuthContext";
@@ -22,7 +23,7 @@ export default function StudentDashboard() {
   const { logout } = useAuth();
 
   const [activeTab, setActiveTab] = useState<
-    "dashboard" | "modules" | "tests"
+    "dashboard" | "modules" | "tests" | "profile"
   >("dashboard");
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -147,6 +148,8 @@ export default function StudentDashboard() {
         className={`fixed md:sticky top-0 left-0 h-screen w-72 bg-white border-r-[6px] border-black p-8 flex flex-col z-[120]
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
       >
+
+        {/* HEADER */}
         <div className="flex justify-between mb-12">
           <h1 className="text-3xl font-black uppercase italic bg-yellow-400 border-4 border-black px-4 py-1">
             DASHBOARD
@@ -159,8 +162,9 @@ export default function StudentDashboard() {
           </button>
         </div>
 
-        {/* NAV */}
+        {/* 🔝 TOP NAV */}
         <nav className="flex flex-col gap-5">
+
           {[
             { id: "dashboard", icon: <BarChart2 />, label: "Dashboard" },
             { id: "modules", icon: <Book />, label: "Modules" },
@@ -194,19 +198,46 @@ export default function StudentDashboard() {
             Mock Test
             <Lock size={16} className="ml-auto" />
           </button>
+
         </nav>
 
-        {/* LOGOUT */}
-        <button
-          onClick={() => {
-            logout();
-            window.location.href = "/login";
-          }}
-          className="mt-auto flex items-center justify-center gap-3 border-[4px] border-black p-5 font-black uppercase text-xs bg-black text-white hover:bg-red-600 transition"
-        >
-          <LogOut size={20} />
-          Logout
-        </button>
+        {/* 🔽 BOTTOM SECTION */}
+        <div className="mt-auto flex flex-col gap-4">
+
+          <p className="text-xs font-bold uppercase text-gray-500">Account</p>
+
+          {/* 👤 PROFILE BUTTON */}
+          <button
+            onClick={() => {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+              setActiveTab("profile");
+              setSidebarOpen(false);
+            }}
+            className={`
+              flex items-center gap-4 border-[4px] border-black p-5 font-black uppercase text-sm
+              ${activeTab === "profile"
+                ? "bg-blue-400 translate-x-1 translate-y-1 shadow-none"
+                : "bg-white shadow-[4px_4px_0px_black] hover:bg-yellow-100 hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"}
+            `}
+          >
+            <ClipboardList />
+            Student Profile
+          </button>
+
+          {/* 🚪 LOGOUT */}
+          <button
+            onClick={() => {
+              logout();
+              window.location.href = "/";
+            }}
+            className="flex items-center justify-center gap-3 border-[4px] border-black p-5 font-black uppercase text-xs bg-black text-white hover:bg-red-600 transition"
+          >
+            <LogOut size={20} />
+            Logout
+          </button>
+
+        </div>
+
       </aside>
 
       {/* MAIN */}
@@ -253,9 +284,15 @@ export default function StudentDashboard() {
                   Take Module Test
                 </div>
 
-                <div className="bg-blue-400 p-6 border-4 border-black font-black flex flex-col gap-3 hover:bg-blue-500 hover:-translate-y-1 hover:shadow-[6px_6px_0px_black] transition-all">
-                  <BarChart2 size={28} />
-                  Performance Overview
+                <div
+                  onClick={() => {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                    setActiveTab("profile");
+                  }}
+                  className="cursor-pointer bg-blue-400 p-6 border-4 border-black font-black flex flex-col gap-3 hover:bg-blue-500 hover:-translate-y-1 hover:shadow-[6px_6px_0px_black] transition-all"
+                >
+                  <ClipboardList size={28} />
+                  Student Profile
                 </div>
 
               </div>
@@ -285,6 +322,11 @@ export default function StudentDashboard() {
 
           {/* TESTS */}
           {activeTab === "tests" && <StudentTests />}
+
+          {/* PROFILE */}
+          {activeTab === "profile" && (
+            <StudentProfile user={user} setUser={setUser} />
+          )}
 
         </div>
 
