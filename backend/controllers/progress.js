@@ -155,11 +155,6 @@ exports.getMyProgress = async (req, res) => {
           moduleTestPassed: false,
           chapters: [],
         });
-      } else {
-        // ✅ self-heal
-        if (existing.moduleTestPassed) {
-          existing.unlocked = true;
-        }
       }
     });
 
