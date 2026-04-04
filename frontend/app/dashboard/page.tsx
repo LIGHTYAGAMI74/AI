@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import AdminDashboard from "./AdminDashboard";
+// import AdminDashboard from "./AdminDashboard";
 import StudentDashboard from "./StudentDashboard";
 
 export default function DashboardPage() {
@@ -60,5 +60,5 @@ export default function DashboardPage() {
     );
   }
 
-  return role === "admin" ? <AdminDashboard /> : <StudentDashboard />;
+  return role === "admin" ? <StudentDashboard /> : <StudentDashboard />;
 }
