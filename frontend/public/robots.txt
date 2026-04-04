@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: http://localhost:3000/sitemap.xml
+Sitemap: https://gridixa-olympiad-frontend.vercel.app/sitemap.xml

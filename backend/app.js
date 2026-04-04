@@ -13,8 +13,7 @@ const app = express();
 // Allowed Origins
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://Gridixaolympaid.vercel.app",
-  "https://Gridixa-gridixa.vercel.app",
+  "https://gridixa-olympiad-frontend.vercel.app",
 ];
 
 const corsOptions = {
