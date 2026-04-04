@@ -132,52 +132,6 @@ exports.markChapterPractice = async (req, res) => {
 };
 
 //////////////////////////////////////////////////////////
-// 🔥 3. MODULE TEST RESULT
-//////////////////////////////////////////////////////////
-
-exports.submitModuleTest = async (req, res) => {
-  try {
-    const { moduleId, score } = req.body;
-
-    const user = await User.findById(req.user.id);
-
-    const module = getModuleProgress(user, moduleId);
-
-    if (score >= 40) {
-      module.moduleTestPassed = true;
-
-      // 🔥 UNLOCK NEXT MODULE
-      const currentIndex = user.progress.modules.findIndex(
-        (m) => m.moduleId.toString() === moduleId
-      );
-
-      const nextModule = user.progress.modules[currentIndex + 1];
-
-      if (nextModule) {
-        nextModule.unlocked = true;
-      }
-    }
-
-    // 🔥 STORE TEST HISTORY
-    user.stats.testHistory.push({
-      testName: "Module Test",
-      score,
-      date: new Date(),
-    });
-
-    await user.save();
-
-    res.json({
-      message: "Test submitted",
-      passed: score >= 40,
-    });
-
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
-//////////////////////////////////////////////////////////
 // 🔥 4. GET USER PROGRESS
 //////////////////////////////////////////////////////////
 
@@ -186,6 +140,60 @@ exports.getMyProgress = async (req, res) => {
     const user = await User.findById(req.user.id).select("progress");
 
     res.json(user.progress);
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+//////////////////////////////////////////////////////////
+// 🔥 5. GET USER STATS
+//////////////////////////////////////////////////////////
+
+exports.submitModuleTest = async (req, res) => {
+  try {
+    const { moduleId, score, moduleTitle } = req.body;
+
+    const user = await User.findById(req.user.id);
+
+    const module = getModuleProgress(user, moduleId);
+
+    // ✅ mark pass
+    if (score >= 40) {
+      module.moduleTestPassed = true;
+    }
+
+    // 🔥 TEST HISTORY LOGIC (BEST SCORE ONLY)
+    const existing = user.stats.testHistory.find(
+      (t) => t.moduleId?.toString() === moduleId
+    );
+
+    if (existing) {
+      existing.attempts += 1;
+      existing.lastScore = score;
+      existing.lastAttemptedAt = new Date();
+
+      if (score > existing.bestScore) {
+        existing.bestScore = score;
+      }
+    } else {
+      user.stats.testHistory.push({
+        moduleId,
+        moduleTitle,
+        bestScore: score,
+        lastScore: score,
+        attempts: 1,
+        lastAttemptedAt: new Date(),
+      });
+    }
+
+    await user.save();
+
+    res.json({
+      message: "Module test submitted",
+      score,
+      passed: score >= 40,
+    });
 
   } catch (err) {
     res.status(500).json({ message: err.message });

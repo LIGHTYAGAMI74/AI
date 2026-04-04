@@ -3,8 +3,11 @@
 import React, { useEffect, useState } from "react";
 import ProctoredEnv from "@/components/ProctoredEnv"; // 🔥 IMPORTANT
 import { getModuleTests } from "@/services/module";
+import { useRouter } from "next/navigation";
+import { getProfile } from "@/services/auth";
 
 export default function StudentTests() {
+  const router = useRouter();
   const [modules, setModules] = useState<any[]>([]);
   const [grouped, setGrouped] = useState<any>({
     "6-8": [],
@@ -22,6 +25,16 @@ export default function StudentTests() {
     "9-10": "2",
     "11-12": "3",
   };
+
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const load = async () => {
+      const profile = await getProfile();
+      setUser(profile);
+    };
+    load();
+  }, []);
 
   // 🔥 FETCH MODULE TESTS
   useEffect(() => {
@@ -109,6 +122,10 @@ export default function StudentTests() {
                 // ⏱ 30 sec per question → minutes
                 const durationMinutes = Math.ceil((totalQuestions * 30) / 60);
 
+                const testData = user?.stats?.testHistory?.find(
+                  (t: any) => t.moduleId === m._id
+                );
+
                 return (
                   <article
                     key={m._id}
@@ -116,8 +133,8 @@ export default function StudentTests() {
                   >
 
                     {/* BACKGROUND TEXT */}
-                    <div className="absolute -right-4 -top-4 text-gray-100 font-black text-7xl md:text-9xl opacity-20 pointer-events-none group-hover:text-pink-100 uppercase">
-                      AI 
+                    <div className="absolute -right-4 -top-4 text-gray-400 px-4 py-2 font-black text-7xl md:text-9xl opacity-20 pointer-events-none uppercase">
+                      {testData ? `${testData.bestScore}%` : "AI"}
                     </div>
 
                     <h3 className="text-2xl md:text-4xl font-black uppercase italic mb-4 relative z-10">
@@ -139,7 +156,7 @@ export default function StudentTests() {
 
                     {/* CTA */}
                     <button
-                      onClick={() => setActiveTest(m)}
+                      onClick={() => router.push(`/test/${m._id}`)}
                       className="w-full bg-blue-600 text-white py-4 md:py-6 border-[4px] border-black font-black uppercase text-lg md:text-xl shadow-[8px_8px_0px_black] hover:bg-white hover:text-black transition active:translate-y-1 active:shadow-none relative z-10"
                     >
                       START MODULE TEST ↗

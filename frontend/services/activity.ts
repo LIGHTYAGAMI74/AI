@@ -28,10 +28,15 @@ export async function markChapterPractice(
 }
 
 // 🔥 MODULE TEST RESULT
-export async function submitModuleTest(moduleId: string, score: number) {
+
+export async function submitModuleTest(data: {
+  moduleId: string;
+  score: number;
+  moduleTitle: string;
+}) {
   return apiRequest("/progress/module-test", {
     method: "POST",
-    body: JSON.stringify({ moduleId, score }),
+    body: JSON.stringify(data),
   });
 }
 
