@@ -2,17 +2,17 @@ import type { Metadata } from "next";
 import HomeClient from "./home-client";
 
 export const metadata: Metadata = {
-  title: "BEN AI - Smart Learning Platform",
+  title: "Gridixa AI Olympiad",
   description:
-    "BEN AI is an AI-powered platform for students with dashboards, insights, and smart learning tools.",
+    "Gridixa AI Olympiad is an AI-powered platform for students with dashboards, insights, and smart learning tools.",
 
   metadataBase: new URL("https://yourdomain.com"),
 
   openGraph: {
-    title: "BEN AI",
+    title: "Gridixa AI Olympiad",
     description: "Learn smarter with AI",
     url: "https://yourdomain.com",
-    siteName: "BEN AI",
+    siteName: "Gridixa AI",
     images: [
       {
         url: "/og-image.png",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "BEN AI",
+    title: "Gridixa AI Olympiad",
     description: "AI-powered learning platform",
     images: ["/og-image.png"],
   },

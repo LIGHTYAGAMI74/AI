@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import {AuthProvider} from "@/context/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,9 +14,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BEN",
-  description: "welcome to the Ben",
-
+  title: {
+    default: "Gridixa AI Olympiad",
+    template: "%s | Gridixa AI Olympiad",
+  },
+  description:
+    "AI Olympiad platform for students to learn, test, and master artificial intelligence.",
+  keywords: [
+    "AI Olympiad",
+    "Artificial Intelligence for students",
+    "AI learning platform",
+  ],
 };
 
 export default function RootLayout({
@@ -24,11 +33,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning={true}>
+    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning={true}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

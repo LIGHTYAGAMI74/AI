@@ -1,6 +1,6 @@
-# BEN AI Platform - Project Summary & Operation Guide
+# Gridixa AI Olympiad Platform - Project Summary & Operation Guide
 
-This document provides a comprehensive overview of the **BEN AI** project, detailing its architecture, file structure, how to operate it locally, and the necessary next steps to optimize it for a better, production-ready version.
+This document provides a comprehensive overview of the **Gridixa AI Olympiad** project, detailing its architecture, file structure, how to operate it locally, and the necessary next steps to optimize it for a better, production-ready version.
 
 ---
 

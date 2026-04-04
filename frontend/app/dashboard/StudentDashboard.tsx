@@ -1,212 +1,293 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Script from "next/script";
 import StudentModules from "./StudentModule";
-import StudentAnalytics from "./StudentAnalytics";
 import StudentTests from "./StudentTest";
+import ActivityGrid from "../../components/ActivityGrid";
+import { getProfile } from "@/services/auth";
+import { useAuth } from "@/context/AuthContext";
 
 import {
   Book,
   BarChart2,
   PenTool,
   LogOut,
-  Lock,
   Menu,
-  X
+  X,
+  Lock,
+  ClipboardList
 } from "lucide-react";
 
 export default function StudentDashboard() {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
+  const { logout } = useAuth();
 
-  const [activeTab, setActiveTab] = useState<"modules" | "analytics" | "tests">("modules");
+  const [activeTab, setActiveTab] = useState<
+    "dashboard" | "modules" | "tests"
+  >("dashboard");
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const role = localStorage.getItem("userRole");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [activeTab]);
 
-    if (!token || role !== "student") {
+  // 🔐 FETCH USER
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
       window.location.href = "/login";
       return;
     }
 
-    const fetchProfile = async () => {
+    const fetchUser = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/auth/profile`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        const data = await res.json();
+        const data = await getProfile();
         setUser(data);
-      } catch (err) {
-        console.error("Profile error");
+
+        if (data.role !== "student") {
+          window.location.href = "/login";
+        }
+      } catch {
+        logout();
+        window.location.href = "/login";
       } finally {
         setLoading(false);
       }
     };
-    fetchProfile();
+
+    fetchUser();
   }, []);
 
-  const handlePayment = async () => {
-    const token = localStorage.getItem("token");
-    try {
-      const res = await fetch(`${API_URL}/api/payment/create-order`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const order = await res.json();
+  const updateActivityLocally = () => {
+    const today = new Date().toLocaleDateString("en-CA", {
+      timeZone: "Asia/Kolkata",
+    });
 
-      const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY,
-        amount: order.amount,
-        currency: order.currency,
-        name: "BEN AI ACADEMY",
-        description: "AI ACCESS",
-        order_id: order.id,
-        handler: async function (response: any) {
-          const verifyRes = await fetch(`${API_URL}/api/payment/verify-payment`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`
-            },
-            body: JSON.stringify(response)
-          });
-          const result = await verifyRes.json();
-          if (result.success) {
-            window.location.reload();
-          }
+    setUser((prev: any) => {
+      if (!prev) return prev;
+
+      const log = prev.stats?.activityLog || [];
+
+      if (log.includes(today)) return prev;
+
+      return {
+        ...prev,
+        stats: {
+          ...prev.stats,
+          activityLog: [...log, today],
+          activityDays: log.length + 1,
         },
-        theme: { color: "#000000" }
       };
-      const rzp = new (window as any).Razorpay(options);
-      rzp.open();
-    } catch (err) {
-      console.error(err);
-    }
+    });
   };
 
+  // 🔄 LOADING UI
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen font-black text-3xl animate-pulse bg-[#fff9e6]">
-        SYNCING_AGENT_DATA...
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[#fff9e6] font-mono px-4 text-center">
+
+        <div className="relative flex items-center justify-center">
+          <div className="absolute h-24 w-24 md:h-32 md:w-32 border-[6px] border-black border-dashed animate-spin" />
+          <div className="h-12 w-12 md:h-16 md:w-16 bg-blue-500 border-4 border-black animate-pulse shadow-[6px_6px_0px_black]" />
+        </div>
+
+        <h1 className="mt-18 text-2xl md:text-4xl text-black font-black italic uppercase">
+          Syncing Neural Data
+        </h1>
+
+        <p className="mt-2 text-xs md:text-sm font-bold text-black uppercase tracking-widest">
+          Establishing secure connection...
+        </p>
+
+        <div className="w-64 md:w-80 h-3 border-2 border-black mt-6 overflow-hidden bg-white">
+          <div className="h-full bg-black animate-[loadingBar_2s_linear_infinite]" />
+        </div>
+
+        <style jsx>{`
+          @keyframes loadingBar {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+          }
+        `}</style>
       </div>
     );
   }
 
+  const testHistory = user?.stats?.testHistory || [];
+
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-[#fff9e6] font-mono text-black">
-      <Script src="https://checkout.razorpay.com/v1/checkout.js" />
 
-      {/* --- FIXED MOBILE HEADER --- */}
-      {/* This bar stays at the top and prevents overlaps */}
+      {/* 🔝 MOBILE HEADER */}
       <header className="md:hidden fixed top-0 left-0 right-0 h-20 bg-white border-b-[6px] border-black flex items-center px-6 z-[100]">
         <button
           onClick={() => setSidebarOpen(true)}
-          className="bg-black text-white p-2 border-2 border-black hover:translate-y-1 transition-all"
+          className="bg-black text-white p-2 border-2 border-black"
         >
           <Menu size={24} />
         </button>
-        <div className="ml-4 text-2xl font-black uppercase italic tracking-tighter">
-          BEN<span className="text-blue-600">.</span>
+        <div className="ml-4 text-2xl font-black uppercase italic">
+          Gridixa<span className="text-blue-600">.</span>
         </div>
       </header>
 
-      {/* --- SIDEBAR OVERLAY --- */}
+      {/* OVERLAY */}
       {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/80 z-[110] md:hidden backdrop-blur-sm"
+        <div
+          className="fixed inset-0 bg-black/80 z-[110] md:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* --- SIDEBAR --- */}
+      {/* SIDEBAR */}
       <aside
-        className={`
-          fixed md:sticky top-0 left-0 h-screen w-72 bg-white border-r-[6px] border-black p-8 flex flex-col
-          transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] z-[120]
-          ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-        `}
+        className={`fixed md:sticky top-0 left-0 h-screen w-72 bg-white border-r-[6px] border-black p-8 flex flex-col z-[120]
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
       >
-        <div className="flex items-center justify-between mb-12">
-          <h1 className="text-3xl font-black uppercase italic bg-yellow-400 border-4 border-black px-4 py-1 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+        <div className="flex justify-between mb-12">
+          <h1 className="text-3xl font-black uppercase italic bg-yellow-400 border-4 border-black px-4 py-1">
             DASHBOARD
           </h1>
-          <button onClick={() => setSidebarOpen(false)} className="md:hidden border-4 border-black p-1 hover:bg-red-500 hover:text-white transition-colors">
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="md:hidden border-4 border-black p-1"
+          >
             <X size={24} />
           </button>
         </div>
 
+        {/* NAV */}
         <nav className="flex flex-col gap-5">
           {[
-            { id: "modules", icon: <Book />, label: "Knowledge Vault" },
-            { id: "analytics", icon: <BarChart2 />, label: "Intel Stats" },
-            { id: "tests", icon: <PenTool />, label: "Active Ops" }
+            { id: "dashboard", icon: <BarChart2 />, label: "Dashboard" },
+            { id: "modules", icon: <Book />, label: "Modules" },
+            { id: "tests", icon: <PenTool />, label: "Tests" }
           ].map((tab: any) => (
             <button
               key={tab.id}
-              disabled={!user?.isPaid}
               onClick={() => {
+                window.scrollTo({ top: 0, behavior: "smooth" });
                 setActiveTab(tab.id);
                 setSidebarOpen(false);
               }}
               className={`
-                flex items-center gap-4 border-[4px] border-black p-5 font-black uppercase text-sm tracking-tight transition-all
+                flex items-center gap-4 border-[4px] border-black p-5 font-black uppercase text-sm
                 ${activeTab === tab.id 
                   ? "bg-blue-400 translate-x-1 translate-y-1 shadow-none" 
-                  : "bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"}
-                ${!user?.isPaid && "opacity-40 cursor-not-allowed"}
+                  : "bg-white shadow-[4px_4px_0px_black] hover:bg-yellow-100 hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"}
               `}
             >
               {tab.icon}
               {tab.label}
-              {!user?.isPaid && <Lock size={16} className="ml-auto" />}
             </button>
           ))}
+
+          {/* 🔒 MOCK TEST */}
+          <button
+            disabled
+            className="flex items-center gap-4 border-[4px] border-black p-5 font-black uppercase text-sm bg-gray-200 opacity-60 cursor-not-allowed"
+          >
+            <ClipboardList />
+            Mock Test
+            <Lock size={16} className="ml-auto" />
+          </button>
         </nav>
 
+        {/* LOGOUT */}
         <button
           onClick={() => {
-            localStorage.clear();
+            logout();
             window.location.href = "/login";
           }}
-          className="mt-auto flex items-center justify-center gap-3 border-[4px] border-black p-5 font-black uppercase text-xs bg-black text-white hover:bg-red-600 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all"
+          className="mt-auto flex items-center justify-center gap-3 border-[4px] border-black p-5 font-black uppercase text-xs bg-black text-white hover:bg-red-600 transition"
         >
           <LogOut size={20} />
-          Abort Session
+          Logout
         </button>
       </aside>
 
-      {/* --- MAIN CONTENT AREA --- */}
-      {/* pt-24 on mobile ensures it starts BELOW the fixed header bar */}
-      <main className="flex-1 p-6 md:p-16 pt-28 md:pt-16 overflow-y-auto w-full min-h-screen">
-        {!user?.isPaid ? (
-          <div className="flex flex-col items-center justify-center text-center max-w-2xl mx-auto py-16 border-[6px] border-black rounded-[50px] bg-white shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
-            <div className="p-8 bg-red-400 border-4 border-black rounded-full mb-8">
-               <Lock size={64} />
+      {/* MAIN */}
+      <main className="flex-1 p-6 md:p-16 pt-28 md:pt-16">
+
+        <div className="max-w-7xl mx-auto">
+
+          {/* DASHBOARD */}
+          {activeTab === "dashboard" && (
+            <div className="space-y-10">
+
+              {/* HEADER */}
+              <div className="border-[6px] border-black p-8 bg-white shadow-[10px_10px_0px_black]">
+                <h2 className="text-4xl font-black italic uppercase">
+                  Welcome {user?.name}!
+                </h2>
+                <p className="font-bold mt-2 text-gray-600">
+                  Continue your AI learning journey.
+                </p>
+              </div>
+
+              {/* ACTION CARDS */}
+              <div className="grid md:grid-cols-3 gap-6">
+
+                <div
+                  onClick={() => {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                    setActiveTab("modules");
+                  }}
+                  className="cursor-pointer bg-yellow-400 p-6 border-4 border-black font-black flex flex-col gap-3 hover:bg-yellow-300 hover:-translate-y-1 hover:shadow-[6px_6px_0px_black] transition-all"
+                >
+                  <Book size={28} />
+                  Continue Learning
+                </div>
+
+                <div
+                  onClick={() => {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                    setActiveTab("tests");
+                  }}
+                  className="cursor-pointer bg-pink-500 text-white p-6 border-4 border-black font-black flex flex-col gap-3 hover:bg-pink-600 hover:-translate-y-1 hover:shadow-[6px_6px_0px_black] transition-all"
+                >
+                  <PenTool size={28} />
+                  Take Module Test
+                </div>
+
+                <div className="bg-blue-400 p-6 border-4 border-black font-black flex flex-col gap-3 hover:bg-blue-500 hover:-translate-y-1 hover:shadow-[6px_6px_0px_black] transition-all">
+                  <BarChart2 size={28} />
+                  Performance Overview
+                </div>
+
+              </div>
+
+              {/* 🔥 ANALYTICS INLINE */}
+              <section>
+                <ActivityGrid activityLog={user?.stats?.activityLog || []} />
+              </section>
+
+              {/* QUICK STATS */}
+              <section className="grid md:grid-cols-2 gap-6">
+                <div className="border-[6px] border-black p-6 bg-yellow-400 font-black">
+                  Tests Completed: {testHistory.length}
+                </div>
+                <div className="border-[6px] border-black p-6 bg-pink-500 text-white font-black">
+                  Streak: {user?.stats?.activityDays || 0}
+                </div>
+              </section>
+
             </div>
-            <h2 className="text-4xl md:text-6xl font-black mb-4 uppercase italic tracking-tighter">
-              ENCRYPTION_ACTIVE
-            </h2>
-            <p className="text-lg md:text-2xl mb-12 font-bold px-6">
-              Full clearance required to access secure neural data nodes.
-            </p>
-            <button
-              onClick={handlePayment}
-              className="bg-yellow-400 border-4 border-black px-12 py-6 font-black text-xl md:text-3xl shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] hover:translate-x-2 hover:translate-y-2 hover:shadow-none transition-all"
-            >
-              INITIALIZE_PAYMENT (₹149)
-            </button>
-          </div>
-        ) : (
-          <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-700">
-            {activeTab === "modules" && <StudentModules />}
-            {activeTab === "analytics" && <StudentAnalytics />}
-            {activeTab === "tests" && <StudentTests />}
-          </div>
-        )}
+          )}
+
+          {/* MODULES */}
+          {activeTab === "modules" && (
+            <StudentModules onActivity={updateActivityLocally} />
+          )}
+
+          {/* TESTS */}
+          {activeTab === "tests" && <StudentTests />}
+
+        </div>
+
       </main>
     </div>
   );
