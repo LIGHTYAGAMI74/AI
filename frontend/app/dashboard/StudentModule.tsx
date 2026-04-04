@@ -486,8 +486,6 @@ export default function StudentModules({ onActivity }: { onActivity?: () => void
       (m: any) => m.moduleId?.toString() === module._id?.toString()
     );
 
-    console.log(progress.modules);
-
     return !!moduleProgress?.unlocked;
   };
 
