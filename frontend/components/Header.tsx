@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const { user } = useAuth();
 
   // 🔥 Smooth scroll handler
   const scrollToSection = (id: string) => {
@@ -26,7 +28,7 @@ export default function Header() {
         {/* LOGO */}
         <Link href="/">
           <div className="text-xl sm:text-2xl md:text-3xl font-black bg-yellow-400 border-[3px] md:border-4 border-black px-3 py-1 -rotate-2 shadow-[3px_3px_0px_black] cursor-pointer">
-            AI OLYMPIAD
+            GRIDIXA
           </div>
         </Link>
 
@@ -61,17 +63,27 @@ export default function Header() {
             Rewards
           </button>
 
-          <Link href="/login">
-            <button className="px-6 py-2 bg-blue-400 border-4 border-black shadow-[4px_4px_0px_black] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all">
-              Login
-            </button>
-          </Link>
+          {user ? (
+            <Link href="/dashboard">
+              <button className="px-6 py-2 bg-pink-500 text-white border-4 border-black shadow-[4px_4px_0px_black] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all">
+                Dashboard
+              </button>
+            </Link>
+          ) : (
+            <>
+              <Link href="/login">
+                <button className="px-6 py-2 bg-blue-400 border-4 border-black shadow-[4px_4px_0px_black] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all">
+                  Login
+                </button>
+              </Link>
 
-          <Link href="/register">
-            <button className="px-6 py-2 bg-pink-400 border-4 border-black shadow-[4px_4px_0px_black] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all">
-              Register
-            </button>
-          </Link>
+              <Link href="/register">
+                <button className="px-6 py-2 bg-pink-400 border-4 border-black shadow-[4px_4px_0px_black] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all">
+                  Register
+                </button>
+              </Link>
+            </>
+          )}
         </div>
 
         {/* MOBILE MENU BUTTON */}
@@ -123,17 +135,27 @@ export default function Header() {
             Rewards
           </button>
 
-          <Link href="/login" onClick={() => setOpen(false)}>
-            <button className="w-full mt-2 px-6 py-3 bg-blue-400 border-4 border-black shadow-[4px_4px_0px_black]">
-              Login
-            </button>
-          </Link>
+          {user ? (
+            <Link href="/dashboard" onClick={() => setOpen(false)}>
+              <button className="w-full mt-2 px-6 py-3 bg-pink-500 text-white border-4 border-black shadow-[4px_4px_0px_black]">
+                Dashboard
+              </button>
+            </Link>
+          ) : (
+            <>
+              <Link href="/login" onClick={() => setOpen(false)}>
+                <button className="w-full mt-2 px-6 py-3 bg-blue-400 border-4 border-black shadow-[4px_4px_0px_black]">
+                  Login
+                </button>
+              </Link>
 
-          <Link href="/register" onClick={() => setOpen(false)}>
-            <button className="w-full mt-2 px-6 py-3 bg-pink-400 border-4 border-black shadow-[4px_4px_0px_black]">
-              Register
-            </button>
-          </Link>
+              <Link href="/register" onClick={() => setOpen(false)}>
+                <button className="w-full mt-2 px-6 py-3 bg-pink-400 border-4 border-black shadow-[4px_4px_0px_black]">
+                  Register
+                </button>
+              </Link>
+            </>
+          )}
         </div>
       )}
     </header>
