@@ -129,7 +129,9 @@ export default function StudentTests() {
                 return (
                   <article
                     key={m._id}
-                    className="group relative border-[6px] border-black p-6 md:p-10 bg-white shadow-[12px_12px_0px_black] hover:bg-yellow-400 transition overflow-hidden"
+                    className={`group relative border-[6px] border-black p-6 md:p-10 shadow-[12px_12px_0px_black] transition overflow-hidden hover:bg-yellow-400 ${
+                      testData?.bestScore > 40 ? "bg-green-200" : "bg-white"
+                    }`}
                   >
 
                     {/* BACKGROUND TEXT */}
