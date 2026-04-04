@@ -1,7 +1,9 @@
 const User = require("../models/user");
 const Module = require("../models/module");
 
+//////////////////////////////////////////////////////////
 // 🔥 HELPER: GET OR CREATE MODULE PROGRESS
+//////////////////////////////////////////////////////////
 const getModuleProgress = (user, moduleId) => {
   let module = user.progress.modules.find(
     (m) => m.moduleId?.toString() === moduleId?.toString()
@@ -22,7 +24,9 @@ const getModuleProgress = (user, moduleId) => {
   return module;
 };
 
+//////////////////////////////////////////////////////////
 // 🔥 HELPER: GET OR CREATE CHAPTER
+//////////////////////////////////////////////////////////
 const getChapterProgress = (module, chapterId) => {
   let chapter = module.chapters.find(
     (c) => c.chapterId === chapterId
@@ -30,7 +34,7 @@ const getChapterProgress = (module, chapterId) => {
 
   if (!chapter) {
     chapter = {
-      chapterId, // now this is chapterKey (STRING)
+      chapterId,
       topics: [],
       topicsCompleted: 0,
       chapterTestPassed: false,
@@ -43,7 +47,9 @@ const getChapterProgress = (module, chapterId) => {
   return chapter;
 };
 
+//////////////////////////////////////////////////////////
 // 🔥 HELPER: GET OR CREATE TOPIC
+//////////////////////////////////////////////////////////
 const getTopicProgress = (chapter, topicId) => {
   let topic = chapter.topics.find(
     (t) => t.topicId === topicId
@@ -64,7 +70,6 @@ const getTopicProgress = (chapter, topicId) => {
 //////////////////////////////////////////////////////////
 // 🔥 1. MARK TOPIC COMPLETE
 //////////////////////////////////////////////////////////
-
 exports.markTopicComplete = async (req, res) => {
   try {
     const { moduleId, chapterId, topicId } = req.body;
@@ -95,7 +100,6 @@ exports.markTopicComplete = async (req, res) => {
 //////////////////////////////////////////////////////////
 // 🔥 2. CHAPTER PRACTICE ATTEMPT
 //////////////////////////////////////////////////////////
-
 exports.markChapterPractice = async (req, res) => {
   try {
     const { moduleId, chapterId, totalChapters } = req.body;
@@ -105,16 +109,13 @@ exports.markChapterPractice = async (req, res) => {
     const module = getModuleProgress(user, moduleId);
     const chapter = getChapterProgress(module, chapterId);
 
-    // ✅ IMPORTANT: ensure chapter exists BEFORE marking
     chapter.chapterTestPassed = true;
     chapter.lastAttemptedAt = new Date();
 
-    // ✅ Ensure module.chapters actually includes ALL attempted chapters
     const passedChapters = module.chapters.filter(
       (c) => c.chapterTestPassed === true
     );
 
-    // ✅ Only mark module complete when all chapters done
     if (totalChapters && passedChapters.length === totalChapters) {
       module.completed = true;
     }
@@ -133,12 +134,55 @@ exports.markChapterPractice = async (req, res) => {
 };
 
 //////////////////////////////////////////////////////////
-// 🔥 4. GET USER PROGRESS
+// 🔥 3. GET USER PROGRESS (SELF-HEALING)
 //////////////////////////////////////////////////////////
-
 exports.getMyProgress = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("progress");
+
+    const allModules = await Module.find();
+
+    allModules.forEach((mod) => {
+      let existing = user.progress.modules.find(
+        (m) => m.moduleId?.toString() === mod._id.toString()
+      );
+
+      if (!existing) {
+        user.progress.modules.push({
+          moduleId: mod._id,
+          unlocked: false, // 🔥 DO NOT AUTO-UNLOCK
+          completed: false,
+          moduleTestPassed: false,
+          chapters: [],
+        });
+      } else {
+        // ✅ self-heal
+        if (existing.moduleTestPassed) {
+          existing.unlocked = true;
+        }
+      }
+    });
+
+    // 🔥 Ensure FIRST MODULE OF EACH LEVEL is unlocked
+    const modulesByLevel = await Module.find().sort({ level: 1, order: 1 });
+
+    const firstModulePerLevel = {};
+
+    modulesByLevel.forEach((mod) => {
+      if (!firstModulePerLevel[mod.level]) {
+        firstModulePerLevel[mod.level] = mod._id.toString();
+      }
+    });
+
+    Object.values(firstModulePerLevel).forEach((moduleId) => {
+      const mod = user.progress.modules.find(
+        (m) => m.moduleId?.toString() === moduleId
+      );
+
+      if (mod) mod.unlocked = true;
+    });
+
+    await user.save();
 
     res.json(user.progress);
 
@@ -148,7 +192,7 @@ exports.getMyProgress = async (req, res) => {
 };
 
 //////////////////////////////////////////////////////////
-// 🔥 5. GET USER STATS
+// 🔥 4. SUBMIT MODULE TEST
 //////////////////////////////////////////////////////////
 exports.submitModuleTest = async (req, res) => {
   try {
@@ -158,13 +202,18 @@ exports.submitModuleTest = async (req, res) => {
 
     const module = getModuleProgress(user, moduleId);
 
-    // ✅ mark pass
+    // ✅ PASS CONDITION
     if (score >= 40) {
       module.moduleTestPassed = true;
       module.completed = true;
+
+      // 🔥 CRITICAL FIX
+      module.unlocked = true;
     }
 
+    //////////////////////////////////////////////////////
     // 🔥 TEST HISTORY
+    //////////////////////////////////////////////////////
     const existing = user.stats.testHistory.find(
       (t) => t.moduleId?.toString() === moduleId
     );
@@ -189,7 +238,7 @@ exports.submitModuleTest = async (req, res) => {
     }
 
     // ===============================
-    // 🔥 UNLOCK NEXT MODULE (ADD THIS)
+    // 🔥 UNLOCK NEXT MODULE (LEVEL-WISE)
     // ===============================
     if (score >= 40) {
       const currentModuleDoc = await Module.findById(moduleId);

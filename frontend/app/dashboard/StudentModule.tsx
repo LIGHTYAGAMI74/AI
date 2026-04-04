@@ -482,17 +482,13 @@ export default function StudentModules({ onActivity }: { onActivity?: () => void
   }, []);
 
   const isModuleUnlocked = (module: any) => {
-    if (!progress) return false;
-
-    const moduleIndex = modules.findIndex((m) => m._id === module._id);
-
-    if (moduleIndex === 0) return true;
-
-    const currentProgress = progress.modules?.find(
+    const moduleProgress = progress?.modules?.find(
       (m: any) => m.moduleId?.toString() === module._id?.toString()
     );
 
-    return !!currentProgress?.unlocked;
+    console.log(progress.modules);
+
+    return !!moduleProgress?.unlocked;
   };
 
   const getModuleProgress = (moduleId: string) =>
