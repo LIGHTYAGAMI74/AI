@@ -485,7 +485,11 @@ export default function StudentModules({ onActivity }: { onActivity?: () => void
     if (!progress) return false;
 
     const moduleIndex = modules.findIndex((m) => m._id === module._id);
+
     if (moduleIndex === 0) return true;
+
+    const currentProgress = getModuleProgress(module._id);
+    if (currentProgress?.unlocked) return true;
 
     const prevModule = modules[moduleIndex - 1];
     if (!prevModule) return false;
