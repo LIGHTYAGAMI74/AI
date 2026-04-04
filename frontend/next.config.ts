@@ -61,6 +61,7 @@ const nextConfig: NextConfig = {
                 'self' 
                 ${process.env.NEXT_PUBLIC_API_URL} 
                 http://localhost:5000 
+                https://ddremdhkwrsnu.cloudfront.net
                 https://api.razorpay.com 
                 https://gridixa-ai-notes.s3.ap-south-1.amazonaws.com
                 https://lumberjack.razorpay.com;
