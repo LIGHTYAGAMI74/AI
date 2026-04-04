@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const Module = require("../models/module");
 
 // 🔥 HELPER: GET OR CREATE MODULE PROGRESS
 const getModuleProgress = (user, moduleId) => {
@@ -149,7 +150,6 @@ exports.getMyProgress = async (req, res) => {
 //////////////////////////////////////////////////////////
 // 🔥 5. GET USER STATS
 //////////////////////////////////////////////////////////
-
 exports.submitModuleTest = async (req, res) => {
   try {
     const { moduleId, score, moduleTitle } = req.body;
@@ -161,9 +161,10 @@ exports.submitModuleTest = async (req, res) => {
     // ✅ mark pass
     if (score >= 40) {
       module.moduleTestPassed = true;
+      module.completed = true;
     }
 
-    // 🔥 TEST HISTORY LOGIC (BEST SCORE ONLY)
+    // 🔥 TEST HISTORY
     const existing = user.stats.testHistory.find(
       (t) => t.moduleId?.toString() === moduleId
     );
@@ -185,6 +186,42 @@ exports.submitModuleTest = async (req, res) => {
         attempts: 1,
         lastAttemptedAt: new Date(),
       });
+    }
+
+    // ===============================
+    // 🔥 UNLOCK NEXT MODULE (ADD THIS)
+    // ===============================
+    if (score >= 40) {
+      const currentModuleDoc = await Module.findById(moduleId);
+
+      const allModules = await Module.find({
+        level: currentModuleDoc.level,
+      }).sort({ order: 1 });
+
+      const currentIndex = allModules.findIndex(
+        (m) => m._id.toString() === moduleId.toString()
+      );
+
+      const nextModule = allModules[currentIndex + 1];
+
+      if (nextModule) {
+        let nextProgress = user.progress.modules.find(
+          (m) =>
+            m.moduleId?.toString() === nextModule._id.toString()
+        );
+
+        if (!nextProgress) {
+          user.progress.modules.push({
+            moduleId: nextModule._id,
+            unlocked: true,
+            completed: false,
+            moduleTestPassed: false,
+            chapters: [],
+          });
+        } else {
+          nextProgress.unlocked = true;
+        }
+      }
     }
 
     await user.save();

@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { submitModuleTest } from "@/services/activity";
+import { getProgress, submitModuleTest } from "@/services/activity";
 
 export default function ProctoredEnv({ module, onExit }: any) {
   const [stage, setStage] = useState<
     "disclaimer" | "exam" | "result" | "blocked"
   >("disclaimer");
+  const [progress, setProgress] = useState<any>(null);
   const [questions, setQuestions] = useState<any[]>([]);
   const [answers, setAnswers] = useState<number[]>([]);
   const [reviewMarked, setReviewMarked] = useState<boolean[]>([]);
@@ -254,6 +255,9 @@ export default function ProctoredEnv({ module, onExit }: any) {
         score: Number.isFinite(finalScore) ? finalScore : 0,
         moduleTitle: module.title,
       });
+
+      const updated = await getProgress();
+      setProgress(updated);
     } catch (err) {
       console.error("Submit failed", err);
     }
