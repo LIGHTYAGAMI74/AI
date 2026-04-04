@@ -663,7 +663,11 @@ export default function StudentModules({ onActivity }: { onActivity?: () => void
                       }}
                       className={`border-[6px] border-black p-6 shadow-[8px_8px_0px_black] transition ${
                         unlocked
-                          ? "bg-white hover:-rotate-1 hover:bg-yellow-50 cursor-pointer"
+                          ? `${
+                              moduleProgress?.moduleTestPassed
+                                ? "bg-green-100"
+                                : "bg-white"
+                            } hover:-rotate-1 cursor-pointer`
                           : "bg-gray-200 cursor-not-allowed opacity-60"
                       }`}
                     >
@@ -679,7 +683,7 @@ export default function StudentModules({ onActivity }: { onActivity?: () => void
                           {!unlocked ? (
                             <Lock className="shrink-0" />
                           ) : moduleProgress?.moduleTestPassed ? (
-                            <span className="text-xs font-black bg-green-200 border-2 border-black px-3 py-1">
+                            <span className="text-xs font-black bg-green-300 border-2 border-black px-3 py-1">
                               Completed
                             </span>
                           ) : null}

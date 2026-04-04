@@ -135,7 +135,7 @@ export default function StudentTests() {
                   >
 
                     {/* BACKGROUND TEXT */}
-                    <div className="absolute -right-4 -top-4 text-gray-400 px-4 py-2 font-black text-7xl md:text-9xl opacity-20 pointer-events-none uppercase">
+                    <div className="absolute -right-4 -top-4 text-gray-400 px-6 py-4 font-black text-7xl md:text-7xl opacity-20 pointer-events-none uppercase">
                       {testData ? `${testData.bestScore}%` : "AI"}
                     </div>
 
