@@ -14,6 +14,7 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:3000",
   "https://gridixa-olympiad-frontend.vercel.app",
+  "https://ai.gridixa.in",
 ];
 
 const corsOptions = {
