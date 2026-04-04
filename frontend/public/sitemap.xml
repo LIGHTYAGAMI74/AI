@@ -2,15 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
   <url>
-    <loc>https://Gridixa.in/</loc>
+    <loc>https://ai.gridixa.in/</loc>
+    <lastmod>2026-04-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>https://Gridixa.in/login</loc>
-  </url>
-
-  <url>
-    <loc>https://Gridixa.in/about</loc>
+    <loc>https://ai.gridixa.in/login</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url>
 
 </urlset>
