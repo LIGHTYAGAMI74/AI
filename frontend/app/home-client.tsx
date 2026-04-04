@@ -24,21 +24,104 @@ const stagger = {
 
 // --- LOADING ANIMATION ---
 const NeuralAnimation = () => {
+  const [visible, setVisible] = useState(true);
+
+  // ⏱ Minimum 3s loader
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setVisible(false);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <div className="relative w-64 h-64 md:w-80 md:h-80 flex items-center justify-center">
-      <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: [1, 1.1, 1] }}
-        transition={{ duration: 0.5, repeat: Infinity }}
-        className="absolute inset-0 bg-yellow-400 border-[6px] border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
-      />
-      <div className="z-10 text-center">
-        <h2 className="text-3xl font-black text-black uppercase">Initializing...</h2>
-        <p className="text-xs mt-2 font-black bg-white px-2 border-2 border-black">
-          AI OLYMPIAD SYSTEM
-        </p>
-      </div>
-    </div>
+    <AnimatePresence>
+      {visible && (
+        <motion.div
+          initial={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-blue-400 font-mono"
+        >
+          <div className="relative w-[300px] h-[300px] flex items-center justify-center">
+
+            {/* 🟡 MAIN CONTAINER */}
+            <div className="absolute inset-0 border-[6px] border-black bg-yellow-400 shadow-[10px_10px_0px_black]" />
+
+            {/* 🔳 GRID (AI FEEL) */}
+            <div className="absolute inset-0 grid grid-cols-5 grid-rows-5 opacity-40">
+              {Array.from({ length: 25 }).map((_, i) => (
+                <motion.div
+                  key={i}
+                  animate={{
+                    opacity: [0.2, 1, 0.2],
+                    scale: [1, 1.2, 1],
+                  }}
+                  transition={{
+                    duration: 1.2,
+                    repeat: Infinity,
+                    delay: i * 0.05,
+                  }}
+                  className="border border-black"
+                />
+              ))}
+            </div>
+
+            {/* ⚡ SCANNING LINE */}
+            <motion.div
+              initial={{ y: "-100%" }}
+              animate={{ y: "100%" }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+              className="absolute left-0 w-full h-2 bg-black opacity-20"
+            />
+
+            {/* 🧠 TEXT */}
+            <div className="z-10 text-center">
+              <motion.h2
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                className="text-2xl md:text-3xl font-black text-black uppercase"
+              >
+                AI OLYMPIAD
+              </motion.h2>
+
+              {/* ✨ LOADING TEXT */}
+              <motion.p
+                animate={{ opacity: [0.3, 1, 0.3] }}
+                transition={{
+                  duration: 1,
+                  repeat: Infinity,
+                }}
+                className="text-sm text-black font-bold mt-2 tracking-widest"
+              >
+                LOADING MODULE...
+              </motion.p>
+
+              {/* 🔥 PROGRESS BAR (fake but smooth) */}
+              <div className="mt-4 w-40 h-3 border-2 border-black bg-white overflow-hidden mx-auto">
+                <motion.div
+                  initial={{ x: "-100%" }}
+                  animate={{ x: "100%" }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: "linear",
+                  }}
+                  className="h-full w-1/2 bg-black"
+                />
+              </div>
+            </div>
+
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
@@ -121,7 +204,7 @@ export default function HomePage() {
             </motion.div>
 
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mt-10 sm:mt-12">
-              <Link href="/login" className="w-full sm:w-auto">
+              <Link href="/register" className="w-full sm:w-auto">
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   className="group relative w-full sm:w-auto px-8 md:px-12 py-4 md:py-6 bg-black text-white font-black uppercase tracking-tighter text-lg sm:text-xl md:text-2xl hover:bg-blue-600 transition-colors"

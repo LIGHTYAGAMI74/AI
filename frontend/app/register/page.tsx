@@ -318,7 +318,7 @@ export default function RegisterPage() {
             )}
 
             <button onClick={handleVerifyOtp}
-              className="w-full bg-black text-white py-4 rounded-2xl font-black">
+              className="w-full bg-black text-white py-4 rounded-2xl font-black hover:bg-blue-600 transition duration-200">
               Verify OTP
             </button>
           </div>
@@ -330,7 +330,7 @@ export default function RegisterPage() {
             <p className="font-black text-lg">Registration Fee: ₹149</p>
 
             <button onClick={handlePayment}
-              className="w-full bg-black text-white py-4 rounded-2xl font-black">
+              className="w-full bg-black text-white py-4 rounded-2xl font-black hover:bg-blue-600 transition duration-200">
               Pay & Register
             </button>
           </div>
@@ -340,7 +340,7 @@ export default function RegisterPage() {
           Already registered?
         </p>
         <p className="text-center font-bold text-sm">
-          <Link href="/login" className="text-blue-600 underline">Login here</Link>
+          <Link href="/login" className="text-blue-600 underline hover:text-yellow-500 transition duration-200">Login here</Link>
         </p>
 
       </div>

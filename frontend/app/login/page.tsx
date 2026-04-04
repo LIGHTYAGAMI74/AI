@@ -198,7 +198,7 @@ export default function LoginPage() {
 
             <button
               onClick={handlePayment}
-              className="w-full bg-black text-white py-4 font-black"
+              className="w-full bg-black text-white py-4 font-black hover:bg-blue-600 transition duration-200"
             >
               Pay Now
             </button>
