@@ -1,127 +1,202 @@
-// "use client";
+"use client";
 
-// import React, { useState } from "react";
-// import { Layers } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import {
+  fetchModules,
+  createModule,
+  updateChapterPracticeUrl,
+  updateTopicContent,
+  updateModuleTestUrl,
+} from "@/services/admin";
 
-// export default function AdminModuleLinker() {
-//   const [title, setTitle] = useState("");
-//   const [notionUrl, setNotionUrl] = useState("");
-//   const [level, setLevel] = useState("6-8");
-//   const [loading, setLoading] = useState(false);
+import { Layers } from "lucide-react";
 
-//   const API_URL = process.env.NEXT_PUBLIC_API_URL;
+export default function AdminModuleLinker() {
+  const [modules, setModules] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
-//   const handleSave = async (e: React.FormEvent) => {
-//     e.preventDefault();
+  const [title, setTitle] = useState("");
+  const [level, setLevel] = useState("6-8");
 
-//     const token = localStorage.getItem("token");
+  const loadModules = async () => {
+    const data = await fetchModules();
+    setModules(data.modules || []);
+  };
 
-//     try {
-//       setLoading(true);
+  useEffect(() => {
+    loadModules();
+  }, []);
 
-//       const res = await fetch(`${API_URL}/api/module/add`, {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//           Authorization: `Bearer ${token}`,
-//         },
-//         body: JSON.stringify({ title, notionUrl, level }),
-//       });
+  // 🔥 CREATE MODULE
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
 
-//       if (res.ok) {
-//         alert("✅ Module Saved!");
-//         setTitle("");
-//         setNotionUrl("");
-//       } else {
-//         alert("❌ Failed to save module");
-//       }
-//     } catch (error) {
-//       alert("⚠️ Server error");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
+    await createModule({ title, level });
 
-//   return (
-//     <section className="w-full max-w-3xl mx-auto px-4">
+    setTitle("");
+    await loadModules();
 
-//       {/* PAGE HEADER */}
-//       <header className="mb-10 md:mb-12">
-//         <h2 className="text-3xl md:text-6xl font-black uppercase italic tracking-tighter leading-tight">
-//           Link{" "}
-//           <span className="bg-pink-400 px-3 md:px-4 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-//             Modules
-//           </span>
-//         </h2>
+    setLoading(false);
+  };
 
-//         <p className="mt-3 text-sm font-bold text-gray-600">
-//           Connect your learning modules from Notion to the platform.
-//         </p>
-//       </header>
+  // 🔥 UPDATE FUNCTIONS
+  const handlePracticeUpdate = async (
+    moduleId: string,
+    chapterKey: string,
+    value: string
+  ) => {
+    await updateChapterPracticeUrl(moduleId, chapterKey, value);
+    loadModules();
+  };
 
-//       {/* FORM */}
-//       <form
-//         onSubmit={handleSave}
-//         className="border-[6px] border-black bg-white p-6 md:p-10 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] rotate-[0.5deg]"
-//       >
-//         {/* MODULE TITLE */}
-//         <div className="mb-8">
-//           <label className="block text-xs md:text-sm font-black uppercase mb-2 italic">
-//             Module Designation
-//           </label>
+  const handleTopicUpdate = async (
+    moduleId: string,
+    chapterKey: string,
+    topicId: string,
+    field: "contentUrl" | "videoUrl",
+    value: string
+  ) => {
+    await updateTopicContent(moduleId, chapterKey, topicId, {
+      [field]: value,
+    });
+    loadModules();
+  };
 
-//           <input
-//             type="text"
-//             value={title}
-//             onChange={(e) => setTitle(e.target.value)}
-//             className="w-full border-4 border-black p-4 md:p-5 font-black outline-none focus:bg-yellow-50 text-lg md:text-xl"
-//             placeholder="E.G. NEURAL NETS 101"
-//             required
-//           />
-//         </div>
+  const handleModuleTest = async (moduleId: string, value: string) => {
+    await updateModuleTestUrl(moduleId, value);
+    loadModules();
+  };
 
-//         {/* LEVEL SELECT */}
-//         <div className="mb-8">
-//           <label className="block text-xs md:text-sm font-black uppercase mb-2 italic">
-//             Clearance Level
-//           </label>
+  return (
+    <section className="w-full max-w-6xl mx-auto px-4">
 
-//           <select
-//             value={level}
-//             onChange={(e) => setLevel(e.target.value)}
-//             className="w-full border-4 border-black p-4 md:p-5 font-black uppercase bg-white outline-none cursor-pointer hover:bg-gray-50 text-lg"
-//           >
-//             <option value="6-8">Class 6-8 (Junior Agent)</option>
-//             <option value="9-12">Class 9-12 (Senior Agent)</option>
-//             <option value="College">College (Elite Operative)</option>
-//           </select>
-//         </div>
+      {/* HEADER */}
+      <header className="mb-10">
+        <h2 className="text-4xl font-black uppercase italic">
+          Module Control
+        </h2>
+      </header>
 
-//         {/* NOTION URL */}
-//         <div className="mb-10">
-//           <label className="block text-xs md:text-sm font-black uppercase mb-2 italic">
-//             Notion Data Hub URL
-//           </label>
+      {/* CREATE MODULE */}
+      <form
+        onSubmit={handleCreate}
+        className="border-4 border-black p-6 mb-10 bg-white"
+      >
+        <h3 className="font-black mb-4">Create Module</h3>
 
-//           <input
-//             type="url"
-//             value={notionUrl}
-//             onChange={(e) => setNotionUrl(e.target.value)}
-//             className="w-full border-4 border-black p-4 md:p-5 font-black outline-none focus:bg-yellow-50 text-sm md:text-base"
-//             placeholder="https://notion.site/..."
-//             required
-//           />
-//         </div>
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Module Title"
+          className="border-4 border-black p-3 w-full mb-4"
+          required
+        />
 
-//         {/* SUBMIT BUTTON */}
-//         <button
-//           type="submit"
-//           disabled={loading}
-//           className="w-full bg-blue-600 text-white py-5 md:py-6 font-black uppercase tracking-widest text-lg md:text-2xl border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all disabled:opacity-50"
-//         >
-//           {loading ? "Transmitting..." : "Transmit Data"}
-//         </button>
-//       </form>
-//     </section>
-//   );
-// }
+        <select
+          value={level}
+          onChange={(e) => setLevel(e.target.value)}
+          className="border-4 border-black p-3 w-full mb-4"
+        >
+          <option value="6-8">6-8</option>
+          <option value="9-10">9-10</option>
+          <option value="11-12">11-12</option>
+        </select>
+
+        <button className="bg-black text-white px-6 py-3 font-bold">
+          {loading ? "Creating..." : "Create"}
+        </button>
+      </form>
+
+      {/* MODULE LIST */}
+      <div className="space-y-10">
+        {modules.map((mod) => (
+          <div
+            key={mod._id}
+            className="border-4 border-black p-6 bg-white"
+          >
+            <h3 className="text-2xl font-black mb-4">
+              {mod.title}
+            </h3>
+
+            {/* MODULE TEST URL */}
+            <div className="mb-6">
+              <label className="font-bold">Module Test URL</label>
+              <input
+                defaultValue={mod.moduleTestUrl}
+                onBlur={(e) =>
+                  handleModuleTest(mod._id, e.target.value)
+                }
+                className="border-2 border-black p-2 w-full"
+              />
+            </div>
+
+            {/* CHAPTERS */}
+            {mod.chapters?.map((ch: any) => (
+              <div
+                key={ch.chapterKey}
+                className="border-2 border-black p-4 mb-6"
+              >
+                <h4 className="font-bold mb-3">{ch.title}</h4>
+
+                {/* PRACTICE URL */}
+                <input
+                  defaultValue={ch.practiceUrl}
+                  onBlur={(e) =>
+                    handlePracticeUpdate(
+                      mod._id,
+                      ch.chapterKey,
+                      e.target.value
+                    )
+                  }
+                  className="border-2 border-black p-2 w-full mb-4"
+                  placeholder="Practice URL"
+                />
+
+                {/* TOPICS */}
+                {ch.topics?.map((topic: any, idx: number) => (
+                  <div
+                    key={idx}
+                    className="border p-3 mb-3 bg-gray-50"
+                  >
+                    <p className="font-bold">{topic.title}</p>
+
+                    <input
+                      defaultValue={topic.contentUrl}
+                      onBlur={(e) =>
+                        handleTopicUpdate(
+                          mod._id,
+                          ch.chapterKey,
+                          topic._id,
+                          "contentUrl",
+                          e.target.value
+                        )
+                      }
+                      className="border p-2 w-full mb-2"
+                      placeholder="Content URL"
+                    />
+
+                    <input
+                      defaultValue={topic.videoUrl}
+                      onBlur={(e) =>
+                        handleTopicUpdate(
+                          mod._id,
+                          ch.chapterKey,
+                          topic._id,
+                          "videoUrl",
+                          e.target.value
+                        )
+                      }
+                      className="border p-2 w-full"
+                      placeholder="Video URL"
+                    />
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}

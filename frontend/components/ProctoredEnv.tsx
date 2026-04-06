@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { getProgress, submitModuleTest } from "@/services/activity";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 export default function ProctoredEnv({ module, onExit }: any) {
   const [stage, setStage] = useState<
@@ -143,7 +144,7 @@ export default function ProctoredEnv({ module, onExit }: any) {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch(module.moduleTestUrl);
+        const res = await fetchWithAuth(module.moduleTestUrl);
         const data = await res.json();
 
         const pool = Array.isArray(data) ? data : data?.questions || [];

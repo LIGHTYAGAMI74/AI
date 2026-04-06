@@ -1,13 +1,14 @@
 "use client";
 import React from 'react';
 import Script from 'next/script';
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 export default function PayButton() {
   const handlePayment = async () => {
     const token = localStorage.getItem("token");
 
     // 1. Create Order on Backend
-    const res = await fetch("http://localhost:5050/api/payment/create-order", {
+    const res = await fetchWithAuth("http://localhost:5050/api/payment/create-order", {
       method: "POST",
       headers: { "Authorization": `Bearer ${token}` }
     });
@@ -23,7 +24,7 @@ export default function PayButton() {
       order_id: order.id,
       handler: async function (response: any) {
         // 3. Verify on Backend
-        const verifyRes = await fetch("http://localhost:5050/api/payment/verify-payment", {
+        const verifyRes = await fetchWithAuth("http://localhost:5050/api/payment/verify-payment", {
           method: "POST",
           headers: { 
             "Content-Type": "application/json",
