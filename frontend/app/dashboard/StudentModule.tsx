@@ -667,7 +667,7 @@ export default function StudentModules({ onActivity }: { onActivity?: () => void
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div>
-                          <h3 className="text-xl font-black mb-2">{m.title}</h3>
+                          <h3 className="text-xl font-black mb-2">{m.title}: {m.description}</h3>
                           <p className="text-sm font-semibold text-gray-600">
                             {m.chapters?.length || 0} chapters
                           </p>

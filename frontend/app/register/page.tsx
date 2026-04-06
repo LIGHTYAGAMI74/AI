@@ -10,10 +10,13 @@ import {
   registerUser
 } from "@/services/auth";
 import { apiRequest } from "@/lib/api";
+import { executeRecaptcha } from "@/lib/recaptcha";
 
 export default function RegisterPage() {
 
   const router = useRouter();
+
+  const [isResending, setIsResending] = useState(false);
   
   const STATES = [
     "Delhi","Uttar Pradesh","Haryana","Punjab","Rajasthan","Bihar",
@@ -76,18 +79,23 @@ export default function RegisterPage() {
   const handleSchoolNext = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    await sendRegisterOtp(formData.email); // ✅ HERE
+    const token = await executeRecaptcha("register_step2");
+
+    await sendRegisterOtp(formData.email, token); // 🔥 pass token
+
     setStep(3);
   };
 
   // 🔢 STEP 3 → VERIFY OTP
   const handleVerifyOtp = async () => {
-    await verifyRegisterOtp(formData.email, otp);
+    const token = await executeRecaptcha("register_verify");
 
-    // ✅ CREATE USER HERE (IMPORTANT)
+    await verifyRegisterOtp(formData.email, otp, token);
+
     await registerUser({
       ...formData,
-      paymentStatus: "pending" // 🔥 KEY ADDITION
+      paymentStatus: "pending",
+      recaptchaToken: token // optional
     });
 
     setStep(4);
@@ -303,9 +311,19 @@ export default function RegisterPage() {
             {canResend ? (
               <button
                 onClick={async () => {
-                  await sendRegisterOtp(formData.email);
-                  setTimer(60);
-                  setCanResend(false);
+                  try {
+                    setIsResending(true);
+
+                    const token = await executeRecaptcha("resend_otp");
+                    await sendRegisterOtp(formData.email, token);
+
+                    setTimer(60);
+                    setCanResend(false);
+                  } catch {
+                    alert("Try again");
+                  } finally {
+                    setIsResending(false);
+                  }
                 }}
                 className="text-blue-600 underline font-bold text-sm"
               >

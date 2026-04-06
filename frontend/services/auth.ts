@@ -27,7 +27,7 @@ export interface RegisterPayload {
 }
 
 // 🔐 LOGIN
-export async function loginUser(data: LoginPayload) {
+export async function loginUser(data: LoginPayload & { recaptchaToken?: string }) {
   return apiRequest("/auth/login", {
     method: "POST",
     body: JSON.stringify(data),
@@ -50,7 +50,7 @@ export async function updateProfile(data: any) {
 }
 
 // 📝 REGISTER
-export async function registerUser(data: RegisterPayload) {
+export async function registerUser(data: RegisterPayload & { recaptchaToken?: string }) {
   return apiRequest("/auth/register", {
     method: "POST",
     body: JSON.stringify(data),
@@ -59,17 +59,17 @@ export async function registerUser(data: RegisterPayload) {
 
 // 🔐 REGISTER FLOW
 
-export async function sendRegisterOtp(email: string) {
+export async function sendRegisterOtp(email: string, recaptchaToken: string) {
   return apiRequest("/auth/send-register-otp", {
     method: "POST",
-    body: JSON.stringify({ email }),
+    body: JSON.stringify({ email, recaptchaToken }),
   });
 }
 
-export async function verifyRegisterOtp(email: string, otp: string) {
+export async function verifyRegisterOtp(email: string, otp: string, recaptchaToken: string) {
   return apiRequest("/auth/verify-register-otp", {
     method: "POST",
-    body: JSON.stringify({ email, otp }),
+    body: JSON.stringify({ email, otp, recaptchaToken }),
   });
 }
 

@@ -4,14 +4,26 @@ interface ActivityProps {
   activityLog: string[];
 }
 
+const formatDate = (date: Date) =>
+  date.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+
+export function calculateStreak(activityLog: string[] = []) {
+  let streak = 0;
+  let current = new Date();
+
+  while (true) {
+    const dateStr = formatDate(current);
+    if (activityLog.includes(dateStr)) {
+      streak++;
+      current.setDate(current.getDate() - 1);
+    } else break;
+  }
+
+  return streak;
+}
+
 export default function ActivityGrid({ activityLog = [] }: ActivityProps) {
   const today = new Date();
-
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString("en-CA", {
-      timeZone: "Asia/Kolkata",
-    });
-  };
 
   const days = Array.from({ length: 100 }, (_, i) => {
     const d = new Date();
@@ -19,23 +31,7 @@ export default function ActivityGrid({ activityLog = [] }: ActivityProps) {
     return formatDate(d);
   }).reverse();
 
-  // 🔥 STREAK CALCULATION
-  const calculateStreak = () => {
-    let streak = 0;
-    let current = new Date();
-
-    while (true) {
-      const dateStr = formatDate(current);
-      if (activityLog.includes(dateStr)) {
-        streak++;
-        current.setDate(current.getDate() - 1);
-      } else break;
-    }
-
-    return streak;
-  };
-
-  const streak = calculateStreak();
+  const streak = calculateStreak(activityLog);
 
   return (
     <div className="border-[6px] border-black p-8 bg-white shadow-[12px_12px_0px_black] mb-10 -rotate-1">

@@ -7,6 +7,7 @@ import { ArrowLeft } from 'lucide-react';
 import { loginUser, sendResetOtp, verifyResetOtp, resetPassword, createOrder } from "@/services/auth";
 import { useAuth } from "@/context/AuthContext";
 import { apiRequest } from "@/lib/api";
+import { executeRecaptcha } from '@/lib/recaptcha';
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -31,11 +32,16 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const data = await loginUser({ email, password });
+      const token = await executeRecaptcha("login");
+
+      const data = await loginUser({
+        email,
+        password,
+        recaptchaToken: token
+      });
 
       login(data.token, data.user);
 
-      // 🔥 PAYMENT CHECK
       if (data.user.paymentStatus === "pending") {
         setShowPaymentModal(true);
       } else {
@@ -43,7 +49,7 @@ export default function LoginPage() {
       }
 
     } catch (err: any) {
-      alert(err.message || "Access Denied: Invalid Credentials");
+      alert(err.message || "Access Denied");
     } finally {
       setIsLoading(false);
     }

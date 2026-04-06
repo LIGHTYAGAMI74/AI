@@ -139,9 +139,13 @@ export default function StudentTests() {
                       {testData ? `${testData.bestScore}%` : "AI"}
                     </div>
 
-                    <h3 className="text-2xl md:text-4xl font-black uppercase italic mb-4 relative z-10">
+                    <h3 className="text-xl md:text-4xl font-black uppercase italic relative z-10">
                       {m.title}
                     </h3>
+
+                    <div>
+                      <h3 className="text-lg font-black mb-4">{m.description}</h3>
+                    </div>
 
                     {/* META */}
                     <div className="flex flex-wrap gap-3 mb-6 relative z-10">

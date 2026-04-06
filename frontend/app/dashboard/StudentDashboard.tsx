@@ -4,9 +4,10 @@ import React, { useState, useEffect } from "react";
 import StudentModules from "./StudentModule";
 import StudentTests from "./StudentTest";
 import StudentProfile from "./StudentProfile";
-import ActivityGrid from "../../components/ActivityGrid";
+import ActivityGrid, { calculateStreak } from "../../components/ActivityGrid";
 import { getProfile } from "@/services/auth";
 import { useAuth } from "@/context/AuthContext";
+import { getModules } from "@/services/module";
 
 import {
   Book,
@@ -16,7 +17,11 @@ import {
   Menu,
   X,
   Lock,
-  ClipboardList
+  ClipboardList,
+  Flame,
+  Rocket,
+  PartyPopper,
+  Smile,
 } from "lucide-react";
 
 export default function StudentDashboard() {
@@ -29,10 +34,24 @@ export default function StudentDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [modules, setModules] = useState<any[]>([]);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [activeTab]);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, [activeTab]);
+
+    useEffect(() => {
+    const fetchModules = async () => {
+      try {
+        const data = await getModules();
+        setModules(data);
+      } catch (err) {
+        console.error("Failed to fetch modules");
+      }
+    };
+
+    fetchModules();
+  }, []);
 
   // 🔐 FETCH USER
   useEffect(() => {
@@ -118,6 +137,64 @@ export default function StudentDashboard() {
   }
 
   const testHistory = user?.stats?.testHistory || [];
+
+  // 📅 DAYS SINCE JOIN
+  const createdAt = user?.createdAt ? new Date(user.createdAt) : null;
+
+  const daysSinceJoin = createdAt
+    ? Math.max(
+        1,
+        Math.ceil(
+          (new Date().getTime() - createdAt.getTime()) /
+            (1000 * 60 * 60 * 24)
+        )
+      )
+    : 1;
+
+  // 🧠 MODULE PROGRESS
+  const modulesCompleted = testHistory.length;
+  const TOTAL_MODULES = 7;
+
+  const isCompletedAll = modulesCompleted >= TOTAL_MODULES;
+
+  const nextModuleNumber = isCompletedAll ? null : modulesCompleted + 1;
+
+  // 🎯 MOTIVATION MESSAGE
+  let motivationMessage = "";
+
+    if (modulesCompleted === 0) {
+    motivationMessage =
+      "Your AI journey begins now. Start your first module and build your foundation.";
+  } else if (isCompletedAll) {
+    motivationMessage =
+      "You’ve completed everything. Now refine, revise, and aim for the top ranks.";
+  } else if (modulesCompleted === 1) {
+    motivationMessage =
+      "You’ve completed Module 1. Great start! Module 2 is where things get exciting.";
+  } else if (modulesCompleted < 5) {
+    motivationMessage =
+      `You’ve completed ${modulesCompleted} modules. Keep the momentum going — consistency is your superpower.`;
+  } else {
+    motivationMessage =
+      "You're close to completing the full syllabus. Stay locked in — you're almost there.";
+  }
+
+  const lastModuleEntry = testHistory[testHistory.length - 1];
+
+  const lastModuleData = modules.find(
+    (m: any) => String(m._id) === String(lastModuleEntry?.moduleId)
+  );
+
+  const lastModuleTitle = lastModuleEntry?.moduleTitle;
+  const lastModuleDescription = lastModuleData?.description;
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString("en-CA", {
+      timeZone: "Asia/Kolkata",
+    });
+  };
+
+  const streak = calculateStreak(user?.stats?.activityLog || []);
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-[#fff9e6] font-mono text-black">
@@ -249,14 +326,66 @@ export default function StudentDashboard() {
           {activeTab === "dashboard" && (
             <div className="space-y-10">
 
-              {/* HEADER */}
-              <div className="border-[6px] border-black p-8 bg-white shadow-[10px_10px_0px_black]">
-                <h2 className="text-4xl font-black italic uppercase">
-                  Welcome {user?.name}!
-                </h2>
-                <p className="font-bold mt-2 text-gray-600">
-                  Continue your AI learning journey.
-                </p>
+              <div className="relative border-[6px] border-black bg-gradient-to-br from-yellow-300 via-white to-blue-300 p-8 shadow-[10px_10px_0px_black] overflow-hidden">
+
+                {/* 🔥 Animated background pulse */}
+                <div className="absolute inset-0 opacity-10 animate-pulse bg-[radial-gradient(circle,_#000_1px,_transparent_1px)] [background-size:20px_20px]" />
+
+                <div className="relative z-10 space-y-3">
+
+                  <h2 className="text-3xl md:text-5xl font-black uppercase leading-tight">
+                    Hello {user?.name?.split(" ")[0]} <Smile className="inline w-10 h-10 align-top" />
+                  </h2>
+
+                  <p className="text-lg md:text-xl font-black text-blue-700">
+                    Welcome to <span className="bg-black text-white px-2 py-1">Day {daysSinceJoin}</span> of your journey <Rocket className="inline w-5 h-5 align-middle" />
+                  </p>
+
+                  <div className="mt-4 border-l-[6px] border-black bg-white p-4 font-bold text-sm md:text-base">
+
+                    {modulesCompleted > 0 && lastModuleTitle && (
+                      <div className="mb-3">
+                        <p className="text-xs font-black text-gray-700 uppercase">
+                          Last Completed Module
+                        </p>
+                        <p className="text-sm font-black text-blue-700">
+                          {lastModuleTitle}: {lastModuleDescription}
+                        </p>
+                      </div>
+                    )}
+
+                    {modulesCompleted === 0 ? (
+                      <>You haven’t started yet — let’s begin your first module today.</>
+                    ) : isCompletedAll ? (
+                      <div className="text-green-700 font-black">
+                        <PartyPopper className="inline w-4 h-4 align-middle" /> You’ve completed the entire AI Olympiad syllabus!
+                        <br />
+                        Time to revise, master concepts, and dominate the Olympiad.
+                      </div>
+                    ) : (
+                      <>
+                        You have completed{" "}
+                        <span className="text-green-600">{modulesCompleted}</span> module
+                        {modulesCompleted > 1 && "s"}.
+                        <br />
+                        Module{" "}
+                        <span className="text-blue-600">{nextModuleNumber}</span> awaits you.
+                      </>
+                    )}
+
+                  </div>
+
+                  {user?.stats?.activityDays > 3 && (
+                    <div className="inline-block mt-3 px-4 py-2 bg-green-400 border-2 border-black font-black text-xs">
+                      <Flame className="inline w-4 h-4 align-middle" /> {user.stats.activityDays} day streak — keep it alive!
+                    </div>
+                  )}
+
+                  <p className="font-bold text-sm md:text-base text-black/80">
+                    {motivationMessage}
+                  </p>
+
+                </div>
               </div>
 
               {/* ACTION CARDS */}
@@ -308,7 +437,7 @@ export default function StudentDashboard() {
                   Tests Completed: {testHistory.length}
                 </div>
                 <div className="border-[6px] border-black p-6 bg-pink-500 text-white font-black">
-                  Streak: {user?.stats?.activityDays || 0}
+                  Streak: {streak}
                 </div>
               </section>
 

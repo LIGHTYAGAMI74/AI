@@ -1,7 +1,7 @@
 // config/env.js
 require("dotenv").config();
 
-const requiredEnv = ["MONGO_URI", "JWT_SECRET", "SMTP_HOST", "SMTP_USER", "SMTP_PASS", "SMTP_FROM", "RAZORPAY_KEY_ID", "RAZORPAY_KEY_SECRET"];
+const requiredEnv = ["MONGO_URI", "JWT_SECRET", "SMTP_HOST", "SMTP_USER", "SMTP_PASS", "SMTP_FROM", "RAZORPAY_KEY_ID", "RAZORPAY_KEY_SECRET", "RECAPTCHA_SECRET_KEY"];
 
 requiredEnv.forEach((key) => {
   if (!process.env[key]) {
@@ -21,4 +21,5 @@ module.exports = {
     SMTP_USER: process.env.SMTP_USER,
     SMTP_PASS: process.env.SMTP_PASS,
     SMTP_FROM: process.env.SMTP_FROM,
+    RECAPTCHA_SECRET_KEY: process.env.RECAPTCHA_SECRET_KEY,
 };

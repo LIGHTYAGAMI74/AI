@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const { verifyRecaptcha } = require("../utils/recaptcha");
 
 const {
   saveOtp,
@@ -14,9 +15,14 @@ const generateOtp = () => Math.floor(100000 + Math.random() * 900000);
 //////////////////////////////////////////////////////////
 // 🔐 REGISTER FLOW
 //////////////////////////////////////////////////////////
-
 exports.sendRegisterOtp = async (req, res) => {
-  const { email } = req.body;
+  const { email, recaptchaToken } = req.body;
+
+  const recaptcha = await verifyRecaptcha(recaptchaToken);
+
+  if (!recaptcha.success || recaptcha.score < 0.3) {
+    return res.status(403).json({ message: "Bot detected" });
+  }
 
   const otp = generateOtp();
   await saveOtp(email, otp);
@@ -25,7 +31,13 @@ exports.sendRegisterOtp = async (req, res) => {
 };
 
 exports.verifyRegisterOtp = async (req, res) => {
-  const { email, otp } = req.body;
+  const { email, otp, recaptchaToken } = req.body;
+
+  const recaptcha = await verifyRecaptcha(recaptchaToken);
+
+  if (!recaptcha.success || recaptcha.score < 0.3) {
+    return res.status(403).json({ message: "Bot detected" });
+  }
 
   if (!verifyOtpUtil(email, otp)) {
     return res.status(400).json({ message: "Invalid OTP" });
@@ -37,7 +49,13 @@ exports.verifyRegisterOtp = async (req, res) => {
 
 exports.register = async (req, res) => {
   try {
-    const data = req.body;
+    const { recaptchaToken, ...data } = req.body;
+
+    const recaptcha = await verifyRecaptcha(recaptchaToken);
+
+    if (!recaptcha.success || recaptcha.score < 0.3) {
+      return res.status(403).json({ message: "Bot detected" });
+    }
 
     const existing = await User.findOne({ email: data.email });
     if (existing) {
@@ -64,7 +82,13 @@ exports.register = async (req, res) => {
 //////////////////////////////////////////////////////////
 
 exports.login = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, recaptchaToken } = req.body;
+
+  const recaptcha = await verifyRecaptcha(recaptchaToken);
+
+  if (!recaptcha.success || recaptcha.score < 0.3) {
+    return res.status(403).json({ message: "Bot detected" });
+  }
 
   const user = await User.findOne({ email });
   if (!user) return res.status(400).json({ message: "User not found" });
@@ -135,7 +159,13 @@ exports.logActivity = async (req, res) => {
 //////////////////////////////////////////////////////////
 
 exports.forgotPassword = async (req, res) => {
-  const { email } = req.body;
+  const { email, recaptchaToken } = req.body;
+
+  const recaptcha = await verifyRecaptcha(recaptchaToken);
+
+  if (!recaptcha.success || recaptcha.score < 0.3) {
+    return res.status(403).json({ message: "Bot detected" });
+  }
 
   const user = await User.findOne({ email });
   if (!user) return res.status(400).json({ message: "User not found" });

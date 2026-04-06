@@ -36,6 +36,8 @@ const nextConfig: NextConfig = {
                 'self' 
                 'unsafe-inline' 
                 https://checkout.razorpay.com 
+                https://www.google.com 
+                https://www.gstatic.com
                 https://cdn.razorpay.com;
 
               style-src 
@@ -55,6 +57,7 @@ const nextConfig: NextConfig = {
               frame-src 
                 'self' 
                 https://api.razorpay.com 
+                https://www.google.com
                 https://checkout.razorpay.com;
 
               connect-src 
@@ -64,6 +67,7 @@ const nextConfig: NextConfig = {
                 https://ddremdhkwrsnu.cloudfront.net
                 https://api.razorpay.com 
                 https://gridixa-ai-notes.s3.ap-south-1.amazonaws.com
+                https://www.google.com 
                 https://lumberjack.razorpay.com;
 
             `.replace(/\n/g, ""),
