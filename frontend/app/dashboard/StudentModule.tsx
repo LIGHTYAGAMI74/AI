@@ -4,8 +4,9 @@ import React, { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
+import { createPortal } from "react-dom";
 
-import { ArrowLeft, ArrowRight, Lock, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Lock, X, ArrowUp } from "lucide-react";
 
 import { getModules } from "@/services/module";
 import {
@@ -55,11 +56,15 @@ function normalizeQuestion(raw: any): QuizQuestion | null {
   }
 
   if (options.length < 4) return null;
-
   options = options.slice(0, 4);
 
   const correctRaw =
-    raw?.correctIndex ?? raw?.answerIndex ?? raw?.correct_answer ?? raw?.answer ?? raw?.correct;
+    raw?.correctAnswer ??
+    raw?.correctIndex ??
+    raw?.answerIndex ??
+    raw?.correct_answer ??
+    raw?.answer ??
+    raw?.correct;
 
   let correctIndex = -1;
 
@@ -68,7 +73,9 @@ function normalizeQuestion(raw: any): QuizQuestion | null {
   } else if (typeof correctRaw === "string") {
     const normalized = correctRaw.trim();
 
-    if (/^[ABCD]$/i.test(normalized)) {
+    if (/^\d+$/.test(normalized)) {
+      correctIndex = Number(normalized);
+    } else if (/^[ABCD]$/i.test(normalized)) {
       correctIndex = normalized.toUpperCase().charCodeAt(0) - 65;
     } else {
       correctIndex = options.findIndex(
@@ -81,11 +88,18 @@ function normalizeQuestion(raw: any): QuizQuestion | null {
     correctIndex = 0;
   }
 
-  const shuffled = shuffleArray(
-    options.map((option, index) => ({ option, index }))
-  );
+  const indexedOptions = options.map((option, index) => ({
+    option,
+    originalIndex: index,
+  }));
+
+  const shuffled = shuffleArray(indexedOptions);
+
   const shuffledOptions = shuffled.map((item) => item.option);
-  const newCorrectIndex = shuffled.findIndex((item) => item.index === correctIndex);
+
+  const newCorrectIndex = shuffled.findIndex(
+    (item) => item.originalIndex === correctIndex
+  );
 
   return {
     question: String(question),
@@ -132,6 +146,8 @@ function ChapterTestModal({
   const timerRef = useRef<number | null>(null);
   const answerLockRef = useRef(false);
 
+  const [mounted, setMounted] = useState(false);
+
   const resetTimer = () => {
     if (timerRef.current !== null) {
       window.clearInterval(timerRef.current);
@@ -154,6 +170,16 @@ function ChapterTestModal({
     answerLockRef.current = false;
     onClose();
   };
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setStage("disclaimer");
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -207,6 +233,17 @@ function ChapterTestModal({
 
     loadQuestions();
   }, [isOpen, practiceUrl]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen || stage !== "quiz") return;
@@ -280,21 +317,21 @@ function ChapterTestModal({
     ? Math.round((score / questions.length) * 100)
     : 0;
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-6">
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 px-4 py-6 font-mono text-black">
       <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto border-4 border-black bg-white shadow-[12px_12px_0px_black]">
-        <button
+      <button
           onClick={closeAndReset}
-          className="absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center border-2 border-black bg-white font-black hover:bg-gray-100"
+          className="absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center border-2 border-black bg-white font-black text-black hover:bg-gray-100"
           aria-label="Close"
         >
           <X size={18} />
         </button>
 
         <div className="border-b-4 border-black bg-yellow-300 px-6 py-4 pr-14">
-          <h3 className="text-2xl font-black uppercase">Chapter Test</h3>
+          <h3 className="text-2xl font-black text-black uppercase">Chapter Test</h3>
           <p className="text-sm font-bold">
             {chapterTitle}
           </p>
@@ -326,8 +363,8 @@ function ChapterTestModal({
               </div>
 
               <div className="border-4 border-black bg-white p-5">
-                <p className="font-black uppercase tracking-wide mb-2">Test rules</p>
-                <ul className="list-disc pl-6 space-y-2 text-sm md:text-base text-gray-700">
+                <p className="font-black text-black uppercase tracking-wide mb-2">Test rules</p>
+                <ul className="list-disc pl-6 space-y-2 text-sm md:text-base text-gray-800">
                   <li>No marks are stored here; only your live score will be shown.</li>
                   <li>You cannot go back to a previous question.</li>
                   <li>Keep an eye on the timer for every question.</li>
@@ -336,46 +373,46 @@ function ChapterTestModal({
 
               <button
                 onClick={() => setStage("quiz")}
-                className="inline-flex items-center gap-2 border-4 border-black bg-yellow-400 px-6 py-3 font-black hover:bg-yellow-300"
+                className="inline-flex text-black items-center gap-2 border-4 border-black bg-yellow-400 px-6 py-3 font-black hover:bg-yellow-300"
               >
                 Continue <ArrowRight size={18} />
               </button>
             </div>
           ) : stage === "result" ? (
-            <div className="space-y-6 text-center">
+            <div className="space-y-6 text-black text-center">
               <div className="border-4 border-black bg-green-100 p-8">
-                <h4 className="text-3xl font-black mb-3">Test Completed</h4>
-                <p className="text-lg font-bold">
+                <h4 className="text-3xl font-black text-black mb-3">Test Completed</h4>
+                <p className="text-lg font-bold text-black">
                   You scored <span className="text-2xl">{score}/{questions.length}</span>
                 </p>
-                <p className="mt-2 text-base font-semibold">
+                <p className="mt-2 text-base font-semibold text-black">
                   Performance: <span className="font-black">{percent}%</span>
                 </p>
               </div>
 
               <button
                 onClick={closeAndReset}
-                className="inline-flex items-center gap-2 border-4 border-black bg-yellow-400 px-6 py-3 font-black hover:bg-yellow-300"
+                className="inline-flex items-center gap-2 border-4 border-black bg-yellow-400 px-6 py-3 font-black hover:bg-yellow-300 text-black"
               >
                 Close Test
               </button>
             </div>
           ) : (
             <div className="space-y-6">
-              <div className="flex flex-col gap-3 border-4 border-black bg-white p-4 md:flex-row md:items-center md:justify-between">
-                <div className="font-black uppercase">
+              <div className="flex flex-col text-black gap-3 border-4 border-black bg-white p-4 md:flex-row md:items-center md:justify-between">
+                <div className="font-black test-black uppercase">
                   Question {currentIndex + 1} / {questions.length}
                 </div>
-                <div className="text-sm font-black">
+                <div className="text-sm font-black text-black">
                   Score: {score}/{questions.length}
                 </div>
-                <div className="text-sm font-black">
+                <div className="text-sm font-black text-black">
                   Time Left: <span className="text-red-600">{secondsLeft}s</span>
                 </div>
               </div>
 
               <div className="border-4 border-black bg-gray-50 p-5 md:p-7">
-                <p className="text-lg md:text-xl font-bold leading-relaxed">
+                <p className="text-lg md:text-xl font-bold leading-relaxed text-black">
                   {currentQuestion?.question}
                 </p>
               </div>
@@ -396,20 +433,20 @@ function ChapterTestModal({
                       disabled={locked}
                       className={`border-4 border-black px-5 py-4 text-left font-bold transition disabled:cursor-not-allowed ${optionClass}`}
                     >
-                      <span className="mr-3 inline-flex h-7 w-7 items-center justify-center border-2 border-black bg-yellow-300 text-sm font-black">
+                      <span className="mr-3 inline-flex h-7 w-7 text-black items-center justify-center border-2 border-black bg-yellow-300 text-sm font-black">
                         {String.fromCharCode(65 + index)}
                       </span>
-                      {option}
+                      < span className="text-black"> {option} </span>
                     </button>
                   );
                 })}
               </div>
 
               <div className="flex items-center justify-between gap-4">
-                <div className="text-sm font-semibold text-gray-600">
+                <div className="text-sm font-semibold text-gray-700">
                   The next question will load automatically after your answer or timeout.
                 </div>
-                <div className="text-xs font-black uppercase tracking-wide bg-yellow-300 border-2 border-black px-3 py-2">
+                <div className="text-xs font-black uppercase tracking-wide bg-yellow-300 border-2 border-black px-3 py-2 text-black">
                   Olympiad Mode
                 </div>
               </div>
@@ -417,8 +454,8 @@ function ChapterTestModal({
           )}
         </div>
       </div>
-    </div>
-  );
+    </div>, 
+  document.body);
 }
 
 export default function StudentModules({ onActivity }: { onActivity?: () => void }) {
@@ -429,6 +466,7 @@ export default function StudentModules({ onActivity }: { onActivity?: () => void
     "11-12": [],
   });
   const [progress, setProgress] = useState<any>(null);
+  const [scrollDirection, setScrollDirection] = useState<"top" | "bottom">("bottom");
 
   const [activeModule, setActiveModule] = useState<any>(null);
   const [activeChapter, setActiveChapter] = useState<any>(null);
@@ -446,6 +484,25 @@ export default function StudentModules({ onActivity }: { onActivity?: () => void
   };
 
   const topRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const maxScroll =
+        document.documentElement.scrollHeight - window.innerHeight;
+
+      if (scrollTop > maxScroll / 2) {
+        setScrollDirection("top"); // show ↑
+      } else {
+        setScrollDirection("bottom"); // show ↓
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // FETCH MODULES + PROGRESS
   useEffect(() => {
@@ -648,8 +705,13 @@ export default function StudentModules({ onActivity }: { onActivity?: () => void
                   const moduleProgress = getModuleProgress(m._id);
 
                   return (
+                    <div key={m._id} className="relative group">
+                      {!unlocked && (
+                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 hidden group-hover:flex items-center gap-2 bg-black text-white border-2 border-yellow-400 px-4 py-2 font-black text-xs uppercase whitespace-nowrap shadow-[4px_4px_0px_#facc15]">
+                          <Lock size={12} /> Score 40%+ on the previous module test to unlock
+                        </div>
+                      )}
                     <div
-                      key={m._id}
                       onClick={() => {
                         if (!unlocked) return;
                         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -690,6 +752,7 @@ export default function StudentModules({ onActivity }: { onActivity?: () => void
                         ))}
                         {m.chapters?.length > 4 && <li>+ more...</li>}
                       </ul>
+                    </div>
                     </div>
                   );
                 })}
@@ -791,6 +854,7 @@ export default function StudentModules({ onActivity }: { onActivity?: () => void
               <div
                 key={t._id}
                 onClick={() => {
+                  setShowTestModal(false); // 🔥 IMPORTANT FIX
                   window.scrollTo({ top: 0, behavior: "smooth" });
                   setActiveTopicIndex(i);
                 }}
@@ -822,151 +886,171 @@ export default function StudentModules({ onActivity }: { onActivity?: () => void
   const isLast = activeTopicIndex === activeChapter.topics.length - 1;
 
   return (
-    <section className="space-y-8">
-      <button
-        onClick={() => {
-          window.scrollTo({ top: 0, behavior: "smooth" });
-          setActiveTopicIndex(null);
-        }}
-        className="inline-flex items-center gap-2 font-black underline underline-offset-4 hover:text-blue-600"
-      >
-        ← Back to Topics
-      </button>
-
-      {renderBreadcrumb()}
-
-      {/* VIDEO */}
-      {topic?.videoUrl && (
-        <div className="aspect-video border-4 border-black overflow-hidden">
-          <iframe
-            src={topic.videoUrl}
-            className="w-full h-full"
-            title={topic.title}
-          />
-        </div>
-      )}
-
-      {/* CONTENT */}
-      {contentLoading ? (
-        <div className="animate-pulse border-4 border-black p-10 bg-gray-100 text-center font-bold">
-          Loading Notes...
-        </div>
-      ) : (
-        <div
-          ref={topRef}
-          className="markdown-body border-4 border-black p-6 md:p-10 bg-white"
+    <>
+      <section className="space-y-8">
+        <button
+          onClick={() => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            setActiveTopicIndex(null);
+          }}
+          className="inline-flex items-center gap-2 font-black underline underline-offset-4 hover:text-blue-600"
         >
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            rehypePlugins={[rehypeRaw]}
-            components={{
-              h1: ({ node, ...props }) => (
-                <h1
-                  className="text-4xl md:text-4xl font-bold mt-6 mb-4"
-                  {...props}
-                />
-              ),
-              h2: ({ node, ...props }) => (
-                <h2
-                  className="text-3xl md:text-3xl font-semibold mt-6 mb-3"
-                  {...props}
-                />
-              ),
-              h3: ({ node, ...props }) => (
-                <h3
-                  className="text-2xl md:text-2xl font-semibold mt-5 mb-3"
-                  {...props}
-                />
-              ),
-              h4: ({ node, ...props }) => (
-                <h4 className="text-xl font-semibold mt-4 mb-2" {...props} />
-              ),
-              p: ({ node, ...props }) => (
-                <p
-                  className="text-base md:text-lg leading-relaxed mb-4 text-gray-800"
-                  {...props}
-                />
-              ),
-              ul: ({ node, ...props }) => (
-                <ul className="list-disc pl-6 mb-4 space-y-2" {...props} />
-              ),
-              ol: ({ node, ...props }) => (
-                <ol className="list-decimal pl-6 mb-4 space-y-2" {...props} />
-              ),
-              li: ({ node, ...props }) => (
-                <li className="text-base md:text-lg" {...props} />
-              ),
-              strong: ({ node, ...props }) => (
-                <strong className="font-semibold text-black" {...props} />
-              ),
-              em: ({ node, ...props }) => (
-                <em className="italic text-gray-700" {...props} />
-              ),
-              a: ({ node, ...props }) => (
-                <a
-                  className="text-blue-600 underline font-medium"
-                  target="_blank"
-                  rel="noreferrer"
-                  {...props}
-                />
-              ),
-              blockquote: ({ node, ...props }) => (
-                <blockquote
-                  className="border-l-4 border-black pl-4 italic text-gray-600 my-4"
-                  {...props}
-                />
-              ),
-              code({ inline, className, children, ...props }: any) {
-                return inline ? (
-                  <code className="bg-gray-200 px-2 py-1 rounded text-sm" {...props}>
-                    {children}
-                  </code>
-                ) : (
-                  <pre className="bg-black text-green-400 p-4 rounded-lg overflow-x-auto my-4">
-                    <code {...props}>{children}</code>
-                  </pre>
-                );
-              },
-              table: ({ node, ...props }) => (
-                <div className="overflow-x-auto my-6">
-                  <table className="min-w-full border-2 border-black" {...props} />
-                </div>
-              ),
-              th: ({ node, ...props }) => (
-                <th
-                  className="border border-black bg-yellow-300 px-4 py-2 text-left font-bold"
-                  {...props}
-                />
-              ),
-              td: ({ node, ...props }) => (
-                <td className="border border-black px-4 py-2" {...props} />
-              ),
-            }}
+          ← Back to Topics
+        </button>
+
+        {renderBreadcrumb()}
+
+        {/* VIDEO */}
+        {topic?.videoUrl && (
+          <div className="aspect-video border-4 border-black overflow-hidden">
+            <iframe
+              src={topic.videoUrl}
+              className="w-full h-full"
+              title={topic.title}
+            />
+          </div>
+        )}
+
+        {/* CONTENT */}
+        {contentLoading ? (
+          <div className="animate-pulse border-4 border-black p-10 bg-gray-100 text-center font-bold">
+            Loading Notes...
+          </div>
+        ) : (
+          <div
+            ref={topRef}
+            className="markdown-body border-4 border-black p-6 md:p-10 bg-white"
           >
-            {markdown}
-          </ReactMarkdown>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeRaw]}
+              components={{
+                h1: ({ node, ...props }) => (
+                  <h1
+                    className="text-4xl md:text-4xl font-bold mt-6 mb-4"
+                    {...props}
+                  />
+                ),
+                h2: ({ node, ...props }) => (
+                  <h2
+                    className="text-3xl md:text-3xl font-semibold mt-6 mb-3"
+                    {...props}
+                  />
+                ),
+                h3: ({ node, ...props }) => (
+                  <h3
+                    className="text-2xl md:text-2xl font-semibold mt-5 mb-3"
+                    {...props}
+                  />
+                ),
+                h4: ({ node, ...props }) => (
+                  <h4 className="text-xl font-semibold mt-4 mb-2" {...props} />
+                ),
+                p: ({ node, ...props }) => (
+                  <p
+                    className="text-base md:text-lg leading-relaxed mb-4 text-gray-800"
+                    {...props}
+                  />
+                ),
+                ul: ({ node, ...props }) => (
+                  <ul className="list-disc pl-6 mb-4 space-y-2" {...props} />
+                ),
+                ol: ({ node, ...props }) => (
+                  <ol className="list-decimal pl-6 mb-4 space-y-2" {...props} />
+                ),
+                li: ({ node, ...props }) => (
+                  <li className="text-base md:text-lg" {...props} />
+                ),
+                strong: ({ node, ...props }) => (
+                  <strong className="font-semibold text-black" {...props} />
+                ),
+                em: ({ node, ...props }) => (
+                  <em className="italic text-gray-700" {...props} />
+                ),
+                a: ({ node, ...props }) => (
+                  <a
+                    className="text-blue-600 underline font-medium"
+                    target="_blank"
+                    rel="noreferrer"
+                    {...props}
+                  />
+                ),
+                blockquote: ({ node, ...props }) => (
+                  <blockquote
+                    className="border-l-4 border-black pl-4 italic text-gray-600 my-4"
+                    {...props}
+                  />
+                ),
+                code({ inline, className, children, ...props }: any) {
+                  return inline ? (
+                    <code className="bg-gray-200 px-2 py-1 rounded text-sm" {...props}>
+                      {children}
+                    </code>
+                  ) : (
+                    <pre className="bg-black text-green-400 p-4 rounded-lg overflow-x-auto my-4">
+                      <code {...props}>{children}</code>
+                    </pre>
+                  );
+                },
+                table: ({ node, ...props }) => (
+                  <div className="overflow-x-auto my-6">
+                    <table className="min-w-full border-2 border-black" {...props} />
+                  </div>
+                ),
+                th: ({ node, ...props }) => (
+                  <th
+                    className="border border-black bg-yellow-300 px-4 py-2 text-left font-bold"
+                    {...props}
+                  />
+                ),
+                td: ({ node, ...props }) => (
+                  <td className="border border-black px-4 py-2" {...props} />
+                ),
+              }}
+            >
+              {markdown}
+            </ReactMarkdown>
+          </div>
+        )}
+
+        {/* NAV */}
+        <div className="flex justify-between gap-4">
+          <button
+            disabled={isFirst}
+            onClick={() => setActiveTopicIndex((prev) => (prev ?? 0) - 1)}
+            className="inline-flex items-center gap-2 border-4 border-black px-6 py-3 bg-white font-black disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 transition"
+          >
+            <ArrowLeft size={18} /> Previous
+          </button>
+
+          <button
+            onClick={handleNext}
+            className="inline-flex items-center gap-2 border-4 border-black px-6 py-3 bg-yellow-400 font-black hover:bg-yellow-300 transition"
+          >
+            {isLast ? "Practice Chapter" : "Next"}
+            <ArrowRight size={18} />
+          </button>
         </div>
-      )}
-
-      {/* NAV */}
-      <div className="flex justify-between gap-4">
-        <button
-          disabled={isFirst}
-          onClick={() => setActiveTopicIndex((prev) => (prev ?? 0) - 1)}
-          className="inline-flex items-center gap-2 border-4 border-black px-6 py-3 bg-white font-black disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 transition"
-        >
-          <ArrowLeft size={18} /> Previous
-        </button>
 
         <button
-          onClick={handleNext}
-          className="inline-flex items-center gap-2 border-4 border-black px-6 py-3 bg-yellow-400 font-black hover:bg-yellow-300 transition"
+          onClick={() => {
+            window.scrollTo({
+              top: scrollDirection === "top" ? 0 : document.body.scrollHeight,
+              behavior: "smooth",
+            });
+          }}
+          className="fixed bottom-6 right-6 z-[1000] flex h-12 w-12 items-center justify-center rounded-full border-4 border-black bg-yellow-400 shadow-[4px_4px_0px_black] transition-transform duration-300 hover:-translate-x-1 hover:-translate-y-1"
         >
-          {isLast ? "Practice Chapter" : "Next"}
-          <ArrowRight size={18} />
+          <ArrowUp
+            size={20}
+            className={`transition-transform duration-300 ${
+              scrollDirection === "bottom" ? "rotate-180" : "rotate-0"
+            }`}
+          />
         </button>
-      </div>
+      </section>
 
+      {/* ✅ GLOBAL MODAL (NOW ACTIVE) */}
       <ChapterTestModal
         isOpen={showTestModal}
         onClose={() => {
@@ -974,10 +1058,10 @@ export default function StudentModules({ onActivity }: { onActivity?: () => void
           setActiveTopicIndex(null);
           setActiveChapter(null);
         }}
-        chapterTitle={activeChapter.title}
-        practiceUrl={activeChapter.practiceUrl}
+        chapterTitle={activeChapter?.description || activeChapter?.title}
+        practiceUrl={activeChapter?.practiceUrl}
         onComplete={handleChapterTestComplete}
       />
-    </section>
+    </>
   );
 }
