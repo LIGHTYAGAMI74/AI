@@ -1,16 +1,15 @@
 "use client";
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { useSearchParams } from "next/navigation";
 import { ArrowLeft } from 'lucide-react';
 import { loginUser, sendResetOtp, verifyResetOtp, resetPassword, createOrder } from "@/services/auth";
 import { useAuth } from "@/context/AuthContext";
 import { apiRequest } from "@/lib/api";
 import { executeRecaptcha } from '@/lib/recaptcha';
 
-export default function LoginPage() {
+function LoginPageContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -303,7 +302,7 @@ export default function LoginPage() {
 
       {showToast && (
         <div className="fixed bottom-6 right-6 z-[999]">
-          <div className="bg-black text-white border-4 border-black px-6 py-3 font-black uppercase text-xs shadow-[6px_6px_0px_blue] animate-slideUp">
+          <div className="bg-black text-white border-4 border-black px-6 py-3 font-bold uppercase text-xs shadow-[6px_6px_0px_blue] animate-slideUp">
             {toastMessage}
           </div>
         </div>
@@ -312,11 +311,11 @@ export default function LoginPage() {
       <style jsx>{`
         @keyframes slideUp {
           from {
-            transform: translate(-50%, 40px);
+            transform: translateY(40px);
             opacity: 0;
           }
           to {
-            transform: translate(-50%, 0);
+            transform: translateY(0);
             opacity: 1;
           }
         }
@@ -338,4 +337,12 @@ function loadRazorpay() {
     script.onload = () => resolve(true);
     document.body.appendChild(script);
   });
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="p-10 text-center font-black">Loading...</div>}>
+      <LoginPageContent />
+    </Suspense>
+  );
 }
