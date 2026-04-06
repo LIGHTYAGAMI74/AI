@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const handleLogoutFlow = () => {
       logout();
-      window.location.href = "/login";
+      window.location.href = "/login?reason=unauthorized";
     };
 
     window.addEventListener("session-expired", handleLogoutFlow);
@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const syncLogout = (e: StorageEvent) => {
       if (e.key === "token" && !e.newValue) {
         logout();
-        window.location.href = "/login";
+        window.location.href = "/login?reason=unauthorized";
       }
     };
 

@@ -69,7 +69,7 @@ export default function AdminDashboard() {
         <button
           onClick={() => {
             localStorage.clear();
-            window.location.href = "/";
+            window.location.href = "/login?reason=unauthorized";
           }}
           className="mt-auto flex items-center justify-center gap-3 p-4 border-[4px] border-black font-black uppercase text-xs bg-black text-white hover:bg-red-600 transition"
         >

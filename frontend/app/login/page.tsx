@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useSearchParams } from "next/navigation";
 import { ArrowLeft } from 'lucide-react';
 import { loginUser, sendResetOtp, verifyResetOtp, resetPassword, createOrder } from "@/services/auth";
 import { useAuth } from "@/context/AuthContext";
@@ -22,6 +23,13 @@ export default function LoginPage() {
 
   // 💳 Payment modal
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+
+  // Handle query params for auto logout
+  const searchParams = useSearchParams();
+  const reason = searchParams.get("reason");
+
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   const router = useRouter();
   const { login } = useAuth();
@@ -49,7 +57,8 @@ export default function LoginPage() {
       }
 
     } catch (err: any) {
-      alert(err.message || "Access Denied");
+      setToastMessage(err.message || "Access Denied");
+      setShowToast(true);
     } finally {
       setIsLoading(false);
     }
@@ -62,7 +71,7 @@ export default function LoginPage() {
   };
 
   const handleVerifyOtp = async () => {
-    await verifyResetOtp(email, otp);
+    await verifyResetOtp(email, otp.trim());
     setStep("reset");
   };
 
@@ -113,6 +122,26 @@ export default function LoginPage() {
     const rzp = new (window as any).Razorpay(options);
     rzp.open();
   };
+
+  React.useEffect(() => {
+    if (!reason) return;
+
+    if (reason === "unauthorized") {
+      setToastMessage("Session Ended. Please login.");
+    } else if (reason === "session_expired") {
+      setToastMessage("Session expired due to inactivity.");
+    }
+
+    setShowToast(true);
+
+    setTimeout(() => {
+      setShowToast(false);
+    }, 4000);
+
+    // 🔥 ADD THIS (VERY IMPORTANT)
+    window.history.replaceState({}, "", "/login");
+
+  }, [reason]);
 
   return (
     <div className="min-h-screen bg-[#fff9e6] flex items-center justify-center p-4 md:p-6 font-mono text-black">
@@ -271,6 +300,32 @@ export default function LoginPage() {
           </div>
         </div>
       )}
+
+      {showToast && (
+        <div className="fixed bottom-6 right-6 z-[999]">
+          <div className="bg-black text-white border-4 border-black px-6 py-3 font-black uppercase text-xs shadow-[6px_6px_0px_blue] animate-slideUp">
+            {toastMessage}
+          </div>
+        </div>
+      )}
+
+      <style jsx>{`
+        @keyframes slideUp {
+          from {
+            transform: translate(-50%, 40px);
+            opacity: 0;
+          }
+          to {
+            transform: translate(-50%, 0);
+            opacity: 1;
+          }
+        }
+
+        .animate-slideUp {
+          animation: slideUp 0.4s ease-out;
+        }
+      `}</style>
+
     </div>
   );
 }

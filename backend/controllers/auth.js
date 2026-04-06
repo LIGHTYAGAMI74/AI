@@ -70,7 +70,22 @@ exports.register = async (req, res) => {
       paymentStatus: "pending",
     });
 
-    res.json({ message: "User created", user });
+    // 🔥 ADD THIS
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.json({
+      message: "User created",
+      token,
+      user: {
+        email: user.email,
+        role: user.role,
+        paymentStatus: user.paymentStatus,
+      },
+    });
 
   } catch (err) {
     res.status(500).json({ message: err.message });

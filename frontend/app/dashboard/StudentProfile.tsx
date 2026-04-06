@@ -352,7 +352,7 @@ export default function StudentProfile({ user, setUser }: Props) {
             <button
               onClick={() => {
                 logout();
-                window.location.href = "/";
+                window.location.href = "/login?reason=unauthorized";
               }}
               className="inline-flex items-center justify-center gap-2 border-[4px] border-black bg-red-600 px-5 py-3 text-sm font-black uppercase text-white shadow-[4px_4px_0px_black] hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-none transition-all"
             >

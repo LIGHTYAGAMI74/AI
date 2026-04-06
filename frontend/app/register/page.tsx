@@ -88,14 +88,14 @@ export default function RegisterPage() {
 
   // 🔢 STEP 3 → VERIFY OTP
   const handleVerifyOtp = async () => {
-    const token = await executeRecaptcha("register_verify");
+    const verifyToken = await executeRecaptcha("register_verify");
+    await verifyRegisterOtp(formData.email, otp, verifyToken);
 
-    await verifyRegisterOtp(formData.email, otp, token);
-
+    const registerToken = await executeRecaptcha("register_final");
     await registerUser({
       ...formData,
       paymentStatus: "pending",
-      recaptchaToken: token // optional
+      recaptchaToken: registerToken
     });
 
     setStep(4);

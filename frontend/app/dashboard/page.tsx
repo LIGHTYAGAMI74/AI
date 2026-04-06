@@ -19,7 +19,7 @@ export default function DashboardPage() {
         const token = localStorage.getItem("token");
 
         if (!token) {
-          router.replace("/login");
+          router.replace("/login?reason=unauthorized");
           return;
         }
 
@@ -38,7 +38,7 @@ export default function DashboardPage() {
       } catch (err) {
         console.error("Auth error:", err);
         localStorage.clear();
-        router.replace("/login");
+        router.replace("/login?reason=unauthorized");
       } finally {
         setLoading(false);
       }

@@ -58,7 +58,7 @@ export default function StudentDashboard() {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      window.location.href = "/login";
+      window.location.href = "/login?reason=unauthorized";
       return;
     }
 
@@ -68,11 +68,11 @@ export default function StudentDashboard() {
         setUser(data);
 
         if (data.role !== "student") {
-          window.location.href = "/login";
+          window.location.href = "/login?reason=unauthorized";
         }
       } catch {
         logout();
-        window.location.href = "/login";
+        window.location.href = "/login?reason=unauthorized";
       } finally {
         setLoading(false);
       }
@@ -305,7 +305,7 @@ export default function StudentDashboard() {
           <button
             onClick={() => {
               logout();
-              window.location.href = "/";
+              window.location.href = "/login?reason=unauthorized";
             }}
             className="flex items-center justify-center gap-3 border-[4px] border-black p-5 font-black uppercase text-xs bg-black text-white hover:bg-red-600 transition"
           >

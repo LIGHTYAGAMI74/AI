@@ -41,3 +41,9 @@ html {
   font-family: 'Poppins', sans-serif;
   line-height: 1.7;
 }
+
+.grecaptcha-badge {
+  transform: scale(0.75);
+  transform-origin: bottom right;
+  bottom: 70px !important;
+}

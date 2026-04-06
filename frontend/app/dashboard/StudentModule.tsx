@@ -15,7 +15,6 @@ import {
   markChapterPractice,
   getProgress,
 } from "@/services/activity";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 type QuizQuestion = {
   question: string;
@@ -203,7 +202,7 @@ function ChapterTestModal({
           throw new Error("Practice questions are not available yet.");
         }
 
-        const res = await fetchWithAuth(practiceUrl);
+        const res = await fetch(practiceUrl);
         const data = await res.json();
 
         const pool = Array.isArray(data)
@@ -600,7 +599,7 @@ export default function StudentModules({ onActivity }: { onActivity?: () => void
         return;
       }
 
-      const res = await fetchWithAuth(topic.contentUrl);
+      const res = await fetch(topic.contentUrl);
       const text = await res.text();
 
       if (text.startsWith("<!DOCTYPE")) {
