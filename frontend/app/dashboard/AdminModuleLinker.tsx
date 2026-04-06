@@ -116,7 +116,7 @@ export default function AdminModuleLinker() {
             className="border-4 border-black p-6 bg-white"
           >
             <h3 className="text-2xl font-black mb-4">
-              {mod.title}
+              Class {mod.level} - {mod.title}
             </h3>
 
             {/* MODULE TEST URL */}
