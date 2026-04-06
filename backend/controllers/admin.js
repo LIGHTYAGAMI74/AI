@@ -112,6 +112,10 @@ exports.getUsers = async (req, res) => {
       search,
       level,
       paymentStatus,
+      state,
+      board,
+      sortBy = "createdAt",
+      sortDir = "desc",
     } = req.query;
 
     const query = {};
@@ -120,17 +124,25 @@ exports.getUsers = async (req, res) => {
       query.$or = [
         { name: { $regex: search, $options: "i" } },
         { email: { $regex: search, $options: "i" } },
+        { studentPhone: { $regex: search, $options: "i" } },
       ];
     }
 
     if (level) query.level = level;
     if (paymentStatus) query.paymentStatus = paymentStatus;
+    if (state) query.state = state;
+    if (board) query.board = board;
 
     const users = await User.find(query)
-      .select("name email level paymentStatus stats.activityDays")
+      .select(`
+        name email 
+        studentPhone parentPhone parentEmail
+        level school city state board
+        paymentStatus role createdAt
+      `)
       .skip((page - 1) * limit)
       .limit(Number(limit))
-      .sort({ createdAt: -1 });
+      .sort({ [sortBy]: sortDir === "asc" ? 1 : -1 });
 
     const total = await User.countDocuments(query);
 
@@ -138,7 +150,9 @@ exports.getUsers = async (req, res) => {
       users,
       totalPages: Math.ceil(total / limit),
     });
-  } catch {
+
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -146,11 +160,17 @@ exports.getUsers = async (req, res) => {
 exports.getUserAnalytics = async (req, res) => {
   try {
     const totalUsers = await User.countDocuments();
+
     const activeUsers = await User.countDocuments({
       "stats.activityDays": { $gt: 0 },
     });
+
     const paidUsers = await User.countDocuments({
       paymentStatus: "completed",
+    });
+
+    const pendingUsers = await User.countDocuments({
+      paymentStatus: "pending",
     });
 
     const avg = await User.aggregate([
@@ -162,13 +182,66 @@ exports.getUserAnalytics = async (req, res) => {
       },
     ]);
 
+    // 🔥 STATE COUNTS
+    const stateCountsRaw = await User.aggregate([
+      { $match: { state: { $ne: null } } },
+      {
+        $group: {
+          _id: "$state",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const stateCounts = {};
+    stateCountsRaw.forEach((s) => {
+      stateCounts[s._id] = s.count;
+    });
+
+    // 🔥 BOARD COUNTS
+    const boardCountsRaw = await User.aggregate([
+      { $match: { board: { $ne: null } } },
+      {
+        $group: {
+          _id: "$board",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const boardCounts = {};
+    boardCountsRaw.forEach((b) => {
+      boardCounts[b._id] = b.count;
+    });
+
+    // 🔥 LEVEL COUNTS
+    const levelCountsRaw = await User.aggregate([
+      {
+        $group: {
+          _id: "$level",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const levelCounts = {};
+    levelCountsRaw.forEach((l) => {
+      levelCounts[l._id] = l.count;
+    });
+
     res.json({
       totalUsers,
       activeUsers,
       paidUsers,
+      pendingUsers,
       avgActivityDays: avg[0]?.avgActivityDays || 0,
+      stateCounts,
+      boardCounts,
+      levelCounts,
     });
-  } catch {
+
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
